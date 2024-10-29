@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">idp-RAM</string>
+    <string name="nav_bar_characters">Characters</string>
+    <string name="nav_bar_episodes">Episodes</string>
+</resources>
