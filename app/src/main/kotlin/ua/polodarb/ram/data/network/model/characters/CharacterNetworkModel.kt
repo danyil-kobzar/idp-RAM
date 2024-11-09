@@ -2,8 +2,7 @@ package ua.polodarb.ram.data.network.model.characters
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ua.polodarb.ram.data.repository.models.characters.GenderRepoModel
-import ua.polodarb.ram.data.repository.models.characters.StatusRepoModel
+import ua.polodarb.ram.data.network.model.base.BaseNetworkModel
 
 @Serializable
 data class CharacterNetworkModel(
@@ -19,4 +18,4 @@ data class CharacterNetworkModel(
     @SerialName("name") val name: String,
     @SerialName("url") val url: String,
     @SerialName("created") val created: String
-)
+) : BaseNetworkModel

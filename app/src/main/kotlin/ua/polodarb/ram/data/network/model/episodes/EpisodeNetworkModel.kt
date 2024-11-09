@@ -2,6 +2,7 @@ package ua.polodarb.ram.data.network.model.episodes
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ua.polodarb.ram.data.network.model.base.BaseNetworkModel
 
 @Serializable
 data class EpisodeNetworkModel(
@@ -12,4 +13,4 @@ data class EpisodeNetworkModel(
     @SerialName("name") val name: String,
     @SerialName("url") val url: String,
     @SerialName("created") val created: String
-)
+) : BaseNetworkModel

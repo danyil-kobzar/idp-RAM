@@ -1,5 +1,7 @@
 package ua.polodarb.ram.data.database.entity
 
-enum class StatusEntity {
+import ua.polodarb.ram.data.database.entity.base.BaseDatabaseModel
+
+enum class StatusEntity : BaseDatabaseModel {
     ALIVE, DEAD, UNKNOWN
 }

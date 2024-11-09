@@ -13,7 +13,7 @@ abstract class Reducer<S : UiState, E : UiEvent>(initialVal: S) {
         reduce(_state.value, event)
     }
 
-    fun setState(newState: S) {
+    fun updateState(newState: S) {
         _state.tryEmit(newState)
     }
 

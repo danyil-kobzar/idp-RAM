@@ -17,7 +17,11 @@ interface BaseNetworkSource {
                 Log.e("BaseNetworkSource", ex.stackTraceToString(), ex)
                 throw when (ex) {
                     is ResponseException -> handleHttpException(ex.response, ex)
-                    is UnknownHostException -> ApiExceptions.NoNetworkException("No internet connection or unknown host", ex)
+                    is UnknownHostException -> ApiExceptions.NoNetworkException(
+                        "No internet connection or unknown host",
+                        ex
+                    )
+
                     else -> ApiExceptions.UnknownApiException(ex.message, ex)
                 }
             }

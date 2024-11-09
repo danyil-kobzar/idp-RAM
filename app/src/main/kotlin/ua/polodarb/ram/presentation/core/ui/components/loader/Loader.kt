@@ -29,7 +29,9 @@ fun Loader(
                 modifier =
                 Modifier
                     .matchParentSize()
-                    .background(Color.Black.copy(alpha = 0.25f))
+                    .then(
+                        if (fullScreen) Modifier.background(Color.Black.copy(alpha = 0.25f)) else Modifier
+                    )
                     .pointerInput(Unit) { },
             ) {
                 CircularProgressIndicator(

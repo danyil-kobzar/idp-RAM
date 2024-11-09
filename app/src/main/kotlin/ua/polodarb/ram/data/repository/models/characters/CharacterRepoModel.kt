@@ -1,17 +1,23 @@
 package ua.polodarb.ram.data.repository.models.characters
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import ua.polodarb.ram.data.database.entity.CharacterEntity
 import ua.polodarb.ram.data.network.model.characters.CharacterNetworkModel
+import ua.polodarb.ram.data.repository.models.base.BaseRepoModel
+import ua.polodarb.ram.data.repository.models.base.BaseRepositoryDatabaseMapper
+import ua.polodarb.ram.data.repository.models.base.BaseRepositoryNetworkMapper
 import ua.polodarb.ram.data.repository.models.characters.CharacterLocationRepoModel.Companion.toEntity
-import ua.polodarb.ram.data.repository.models.characters.CharacterLocationRepoModel.Companion.toNetworkModel
-import ua.polodarb.ram.data.repository.models.characters.CharacterLocationRepoModel.Companion.toRepoModel
+import ua.polodarb.ram.data.repository.models.characters.CharacterLocationRepoModel.Companion.toNetwork
+import ua.polodarb.ram.data.repository.models.characters.CharacterLocationRepoModel.Companion.toRepository
 import ua.polodarb.ram.data.repository.models.characters.GenderRepoModel.Companion.toEntity
-import ua.polodarb.ram.data.repository.models.characters.GenderRepoModel.Companion.toNetworkModel
-import ua.polodarb.ram.data.repository.models.characters.GenderRepoModel.Companion.toRepoModel
+import ua.polodarb.ram.data.repository.models.characters.GenderRepoModel.Companion.toNetwork
+import ua.polodarb.ram.data.repository.models.characters.GenderRepoModel.Companion.toRepository
 import ua.polodarb.ram.data.repository.models.characters.StatusRepoModel.Companion.toEntity
-import ua.polodarb.ram.data.repository.models.characters.StatusRepoModel.Companion.toNetworkModel
-import ua.polodarb.ram.data.repository.models.characters.StatusRepoModel.Companion.toRepoModel
+import ua.polodarb.ram.data.repository.models.characters.StatusRepoModel.Companion.toNetwork
+import ua.polodarb.ram.data.repository.models.characters.StatusRepoModel.Companion.toRepository
 
+@Parcelize
 data class CharacterRepoModel(
     val status: StatusRepoModel,
     val species: String,
@@ -25,73 +31,77 @@ data class CharacterRepoModel(
     val name: String,
     val url: String,
     val created: String
-) {
-    companion object {
-        fun CharacterRepoModel.toNetworkModel(): CharacterNetworkModel {
+) : BaseRepoModel, Parcelable {
+
+    companion object :
+        BaseRepositoryNetworkMapper<CharacterRepoModel, CharacterNetworkModel>,
+        BaseRepositoryDatabaseMapper<CharacterRepoModel, CharacterEntity> {
+
+        override fun CharacterNetworkModel.toRepository(): CharacterRepoModel {
+            return CharacterRepoModel(
+                status = status.toRepository(),
+                species = species,
+                type = type,
+                gender = gender.toRepository(),
+                origin = origin.toRepository(),
+                location = location.toRepository(),
+                image = image,
+                episode = episode,
+                id = id,
+                name = name,
+                url = url,
+                created = created
+            )
+        }
+
+        override fun CharacterRepoModel.toNetwork(): CharacterNetworkModel {
             return CharacterNetworkModel(
-                status = this.status.toNetworkModel(),
-                species = this.species,
-                type = this.type,
-                gender = this.gender.toNetworkModel(),
-                origin = this.origin.toNetworkModel(),
-                location = this.location.toNetworkModel(),
-                image = this.image,
-                episode = this.episode,
-                id = this.id,
-                name = this.name,
-                url = this.url,
-                created = this.created
+                status = status.toNetwork(),
+                species = species,
+                type = type,
+                gender = gender.toNetwork(),
+                origin = origin.toNetwork(),
+                location = location.toNetwork(),
+                image = image,
+                episode = episode,
+                id = id,
+                name = name,
+                url = url,
+                created = created
             )
         }
 
-        fun CharacterNetworkModel.toRepoModel(): CharacterRepoModel {
+        override fun CharacterEntity.toRepository(): CharacterRepoModel {
             return CharacterRepoModel(
-                status = this.status.toRepoModel(),
-                species = this.species,
-                type = this.type,
-                gender = this.gender.toRepoModel(),
-                origin = this.origin.toRepoModel(),
-                location = this.location.toRepoModel(),
-                image = this.image,
-                episode = this.episode,
-                id = this.id,
-                name = this.name,
-                url = this.url,
-                created = this.created
+                status = status.toRepository(),
+                species = species,
+                type = type,
+                gender = gender.toRepository(),
+                origin = origin.toRepository(),
+                location = location.toRepository(),
+                image = image,
+                episode = episode,
+                id = id,
+                name = name,
+                url = url,
+                created = created
             )
         }
 
-        fun CharacterRepoModel.toEntity(): CharacterEntity {
+        override fun CharacterRepoModel.toEntity(): CharacterEntity {
             return CharacterEntity(
-                id = this.id,
-                name = this.name,
-                status = this.status.toEntity(),
-                species = this.species,
-                type = this.type,
-                gender = this.gender.toEntity(),
-                origin = this.origin.toEntity(),
-                location = this.location.toEntity(),
-                image = this.image,
-                episode = this.episode,
-                url = this.url,
-                created = this.created
-            )
-        }
-
-        fun CharacterEntity.toRepoModel(): CharacterRepoModel {
-            return CharacterRepoModel(
-                status = this.status.toRepoModel(),
-                species = this.species,
-                type = this.type,
-                gender = this.gender.toRepoModel(),
-                origin = this.origin.toRepoModel(),
-                location = this.location.toRepoModel(),
-                image = this.image,
-                episode = this.episode,
-                id = this.id,
-                name = this.name,
-                url = this.url,
-                created = this.created
+                id = id,
+                name = name,
+                status = status.toEntity(),
+                species = species,
+                type = type,
+                gender = gender.toEntity(),
+                origin = origin.toEntity(),
+                location = location.toEntity(),
+                image = image,
+                episode = episode,
+                url = url,
+                created = created
             )
         }
     }

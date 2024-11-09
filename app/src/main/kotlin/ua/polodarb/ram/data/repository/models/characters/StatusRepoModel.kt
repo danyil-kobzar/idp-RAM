@@ -1,60 +1,52 @@
 package ua.polodarb.ram.data.repository.models.characters
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import ua.polodarb.ram.data.database.entity.StatusEntity
 import ua.polodarb.ram.data.network.model.characters.StatusNetworkModel
+import ua.polodarb.ram.data.repository.models.base.BaseRepoModel
+import ua.polodarb.ram.data.repository.models.base.BaseRepositoryDatabaseMapper
+import ua.polodarb.ram.data.repository.models.base.BaseRepositoryNetworkMapper
 
-enum class StatusRepoModel {
+@Parcelize
+enum class StatusRepoModel : BaseRepoModel, Parcelable {
     ALIVE,
     DEAD,
     UNKNOWN;
 
-    companion object {
+    companion object :
+        BaseRepositoryNetworkMapper<StatusRepoModel, StatusNetworkModel>,
+        BaseRepositoryDatabaseMapper<StatusRepoModel, StatusEntity> {
 
-        fun StatusRepoModel.toNetworkModel(): StatusNetworkModel {
+        override fun StatusNetworkModel.toRepository(): StatusRepoModel {
             return when (this) {
-                StatusRepoModel.ALIVE -> StatusNetworkModel.ALIVE
-                StatusRepoModel.DEAD -> StatusNetworkModel.DEAD
-                StatusRepoModel.UNKNOWN -> StatusNetworkModel.UNKNOWN
+                StatusNetworkModel.ALIVE -> ALIVE
+                StatusNetworkModel.DEAD -> DEAD
+                StatusNetworkModel.UNKNOWN -> UNKNOWN
             }
         }
 
-        fun StatusNetworkModel.toRepoModel(): StatusRepoModel {
+        override fun StatusRepoModel.toNetwork(): StatusNetworkModel {
             return when (this) {
-                StatusNetworkModel.ALIVE -> StatusRepoModel.ALIVE
-                StatusNetworkModel.DEAD -> StatusRepoModel.DEAD
-                StatusNetworkModel.UNKNOWN -> StatusRepoModel.UNKNOWN
+                ALIVE -> StatusNetworkModel.ALIVE
+                DEAD -> StatusNetworkModel.DEAD
+                UNKNOWN -> StatusNetworkModel.UNKNOWN
             }
         }
 
-        fun StatusNetworkModel.toEntity(): StatusEntity {
+        override fun StatusEntity.toRepository(): StatusRepoModel {
             return when (this) {
-                StatusNetworkModel.ALIVE -> StatusEntity.ALIVE
-                StatusNetworkModel.DEAD -> StatusEntity.DEAD
-                StatusNetworkModel.UNKNOWN -> StatusEntity.UNKNOWN
+                StatusEntity.ALIVE -> ALIVE
+                StatusEntity.DEAD -> DEAD
+                StatusEntity.UNKNOWN -> UNKNOWN
             }
         }
 
-        fun StatusEntity.toNetworkModel(): StatusNetworkModel {
+        override fun StatusRepoModel.toEntity(): StatusEntity {
             return when (this) {
-                StatusEntity.ALIVE -> StatusNetworkModel.ALIVE
-                StatusEntity.DEAD -> StatusNetworkModel.DEAD
-                StatusEntity.UNKNOWN -> StatusNetworkModel.UNKNOWN
-            }
-        }
-
-        fun StatusRepoModel.toEntity(): StatusEntity {
-            return when (this) {
-                StatusRepoModel.ALIVE -> StatusEntity.ALIVE
-                StatusRepoModel.DEAD -> StatusEntity.DEAD
-                StatusRepoModel.UNKNOWN -> StatusEntity.UNKNOWN
-            }
-        }
-
-        fun StatusEntity.toRepoModel(): StatusRepoModel {
-            return when (this) {
-                StatusEntity.ALIVE -> StatusRepoModel.ALIVE
-                StatusEntity.DEAD -> StatusRepoModel.DEAD
-                StatusEntity.UNKNOWN -> StatusRepoModel.UNKNOWN
+                ALIVE -> StatusEntity.ALIVE
+                DEAD -> StatusEntity.DEAD
+                UNKNOWN -> StatusEntity.UNKNOWN
             }
         }
     }

@@ -27,7 +27,9 @@ fun RootAppNavigation(
             RootScreen(parentNavController = navController)
         }
 
-        composable(route = ScreensDestination.CharacterDetails.route) {
+        composable(
+            route = ScreensDestination.CharacterDetails.route,
+        ) {
             CharacterDetailsScreen {
                 // todo
             }
