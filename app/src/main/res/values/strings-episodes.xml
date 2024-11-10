@@ -1,0 +1,4 @@
+<resources>
+    <string name="episodes_card_characters">Characters: %1$s</string>
+    <string name="episodes_card_air_date">Air Date: %1$s</string>
+</resources>

@@ -13,50 +13,63 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ua.polodarb.idp_ram.R
-import ua.polodarb.ram.presentation.core.localization.UiText
-import ua.polodarb.ram.presentation.core.mvi.Reducer
+import ua.polodarb.ram.presentation.core.mvi.reducer.Reducer
 import ua.polodarb.ram.presentation.core.mvi.UiEffect
 import ua.polodarb.ram.presentation.core.mvi.UiEvent
+import ua.polodarb.ram.presentation.core.mvi.UiIntent
 import ua.polodarb.ram.presentation.core.mvi.UiState
 import ua.polodarb.ram.presentation.core.platform.error.ApiExceptions
 import ua.polodarb.ram.presentation.core.platform.error.CustomUiError
 
-abstract class BaseViewModel<S : UiState, E : UiEvent, EF : UiEffect>(
+abstract class BaseViewModel<S : UiState, E : UiEvent, EF : UiEffect, I : UiIntent>(
     initialState: S
 ) : ViewModel() {
 
     private val _effect = MutableSharedFlow<EF>()
     val effect: SharedFlow<EF> get() = _effect.asSharedFlow()
 
-    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, exception ->
-        handleException(exception)
-    }
-
     val reducer: Reducer<S, E> by lazy { createReducer(initialState) }
 
     val state: StateFlow<S> get() = reducer.state
 
+    init {
+        lazy { initIntent() }
+    }
+
+    protected open fun initIntent() = Unit
+
+    abstract fun handleIntent(intent: I)
+
     protected fun <T> safeLaunch(
         coroutineContext: CoroutineDispatcher = Dispatchers.IO,
         onLoading: (suspend (Boolean) -> Unit)? = null,
+        onGlobalLoading: (suspend (Boolean) -> Unit)? = null,
         onResult: (suspend (T?) -> Unit)? = null,
         onError: (suspend (Throwable) -> Unit)? = null,
         request: suspend CoroutineScope.() -> T?
     ): Job {
-        return viewModelScope.launch(coroutineContext) {
+        val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+            viewModelScope.launch {
+                val uiError = handleException(throwable)
+                uiError.let { onError?.invoke(it) }
+                onLoading?.invoke(false)
+                onGlobalLoading?.invoke(false)
+            }
+        }
+        return viewModelScope.launch(coroutineExceptionHandler + coroutineContext) {
             try {
                 onLoading?.invoke(true)
+                onGlobalLoading?.invoke(true)
                 val result = withContext(coroutineContext) { request() }
                 onResult?.invoke(result)
             } catch (throwable: Throwable) {
                 onError?.invoke(throwable)
             } finally {
                 onLoading?.invoke(false)
+                onGlobalLoading?.invoke(false)
             }
         }
     }
-
 
     fun sendEvent(vararg event: E) {
         event.forEach {

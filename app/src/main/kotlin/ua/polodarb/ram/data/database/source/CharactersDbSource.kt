@@ -2,7 +2,7 @@ package ua.polodarb.ram.data.database.source
 
 import androidx.paging.PagingSource
 import ua.polodarb.ram.data.database.entity.character.CharacterEntity
-import ua.polodarb.ram.data.database.entity.paging.RemoteKey
+import ua.polodarb.ram.data.database.entity.paging.CharacterRemoteKey
 
 interface CharactersDbSource {
 
@@ -12,12 +12,12 @@ interface CharactersDbSource {
 
     suspend fun insertCharacters(characters: List<CharacterEntity>)
 
-    suspend fun getRemoteKeyByCharacterId(characterId: Int): RemoteKey?
+    suspend fun getRemoteKeyByCharacterId(characterId: Int): CharacterRemoteKey?
 
-    suspend fun insertAllRemoteKeys(remoteKeys: List<RemoteKey>)
+    suspend fun insertAllRemoteKeys(characterRemoteKeys: List<CharacterRemoteKey>)
 
     suspend fun refreshCharactersAndRemoteKeys(
         characters: List<CharacterEntity>,
-        remoteKeys: List<RemoteKey>
+        characterRemoteKeys: List<CharacterRemoteKey>
     )
 }

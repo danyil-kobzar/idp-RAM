@@ -1,10 +1,5 @@
 package ua.polodarb.ram.presentation.feature.characters
 
-import android.annotation.SuppressLint
-import android.util.Log
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +10,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -28,14 +24,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import kotlinx.coroutines.delay
 import ua.polodarb.idp_ram.R
 import ua.polodarb.ram.common.core.utils.Empty
-import ua.polodarb.ram.presentation.core.localization.UiText
 import ua.polodarb.ram.presentation.core.ui.components.card.CharacterCard
 import ua.polodarb.ram.presentation.core.ui.components.pagination.LazyPaginationStateHandler
 import ua.polodarb.ram.presentation.core.ui.components.refresh.PullToRefreshWrapper
@@ -44,7 +42,6 @@ import ua.polodarb.ram.presentation.feature.characters.action.CharactersAction
 import ua.polodarb.ram.presentation.feature.characters.components.CharactersTopBar
 import ua.polodarb.ram.presentation.feature.characters.mvi.CharactersState
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharactersScreen(
@@ -53,7 +50,6 @@ fun CharactersScreen(
     parentPaddingValues: PaddingValues? = null,
     onAction: ((CharactersAction) -> Unit)? = null
 ) {
-
     val characters = state.characters?.collectAsLazyPagingItems()
     var searchQuery by remember { mutableStateOf(String.Empty) }
 
@@ -87,26 +83,40 @@ fun CharactersScreen(
                     onAction?.invoke(CharactersAction.SearchCharacters(it))
                 },
                 onActionClick = {
-                    String.Empty.let {
-                        searchQuery = it
-                        onAction?.invoke(CharactersAction.SearchCharacters(it))
-                    }
+                    searchQuery = String.Empty
+                    onAction?.invoke(CharactersAction.SearchCharacters(searchQuery))
                 }
             )
         }
     ) {
-        when {
-            state.error != null -> {
-                val errorMessage = state.error.title?.asString()
-                errorMessage?.let {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(it)
+        Box(modifier = Modifier.fillMaxSize()) {
+            when {
+                state.error != null -> {
+                    val errorMessage = state.error.title?.asString()
+                    errorMessage?.let {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(it, color = Color.Red, style = MaterialTheme.typography.bodyLarge)
+                        }
                     }
                 }
-            }
 
-            (characters?.itemCount ?: 0) > 0 -> {
-                characters?.let { characters ->
+                characters?.itemCount == 0 && characters.loadState.refresh is LoadState.NotLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            stringResource(R.string.search_empty_value, searchQuery),
+                            color = Color.Gray,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+
+                characters != null -> {
                     LazyVerticalStaggeredGrid(
                         state = lazyStaggeredGridState,
                         columns = StaggeredGridCells.Fixed(2),
@@ -130,21 +140,17 @@ fun CharactersScreen(
                                     character = characterItem,
                                     onCharacterClick = { characterId ->
                                         onAction?.invoke(
-                                            CharactersAction.SelectCharacter(
-                                                characterId
-                                            )
+                                            CharactersAction.SelectCharacter(characterId)
                                         )
                                     }
                                 )
                             }
                         }
 
-                        LazyPaginationStateHandler(
-                            loadState = characters.loadState
-                        )
+                        LazyPaginationStateHandler(loadState = characters.loadState)
 
                         item {
-                            Spacer(modifier = Modifier.size(64.dp))
+                            Spacer(modifier = Modifier.size(96.dp))
                         }
                     }
 
@@ -152,14 +158,6 @@ fun CharactersScreen(
                         state = pullToRefreshState,
                         paddingValues = it
                     )
-                }
-            }
-
-            else -> {
-                if (!state.isLoading && !state.isGlobalLoading) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(UiText.StringResource(R.string.error_no_data).asString())
-                    }
                 }
             }
         }

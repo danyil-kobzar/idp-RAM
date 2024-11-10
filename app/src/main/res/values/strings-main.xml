@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">idp-RAM</string>
+    <string name="title">Rick and Morty</string>
+    <string name="search_empty_value">No results found for \"%1$s\"</string>
+    <string name="search_empty">No results found</string>
     <string name="nav_bar_characters">Characters</string>
     <string name="nav_bar_episodes">Episodes</string>
 </resources>

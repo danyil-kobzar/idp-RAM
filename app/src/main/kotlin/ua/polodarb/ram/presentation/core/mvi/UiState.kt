@@ -1,5 +1,7 @@
 package ua.polodarb.ram.presentation.core.mvi
 
+import android.util.Log
+
 interface UiState {
     val isLoading: Boolean
     val isGlobalLoading: Boolean
@@ -7,14 +9,9 @@ interface UiState {
 
     companion object {
         val Default = object : UiState {
-            override val isLoading: Boolean
-                get() = false
-
-            override val isGlobalLoading: Boolean
-                get() = false
-
-            override val error: Throwable?
-                get() = null
+            override val isLoading: Boolean = false
+            override val isGlobalLoading: Boolean = false
+            override val error: Throwable? = null
         }
     }
 }

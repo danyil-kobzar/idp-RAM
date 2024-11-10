@@ -6,7 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ua.polodarb.ram.data.database.AppDatabase
 import ua.polodarb.ram.data.database.dao.CharactersDao
-import ua.polodarb.ram.data.database.dao.RemoteKeyDao
+import ua.polodarb.ram.data.database.dao.EpisodesDao
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -16,5 +16,8 @@ class DatabaseDaoModule {
     fun bindCharactersDao(database: AppDatabase): CharactersDao = database.charactersDao()
 
     @Provides
-    fun bindRemoteKeyDao(database: AppDatabase): RemoteKeyDao = database.remoteKeyDao()
+    fun bindEpisodesDao(database: AppDatabase): EpisodesDao = database.episodesDao()
+
+//    @Provides
+//    fun bindRemoteKeyDao(database: AppDatabase): RemoteKeyDao = database.remoteKeyDao()
 }

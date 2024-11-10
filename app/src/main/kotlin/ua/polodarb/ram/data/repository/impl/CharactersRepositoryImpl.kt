@@ -4,7 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ua.polodarb.ram.common.core.result.ResultOf
 import ua.polodarb.ram.data.database.entity.character.CharacterEntity
-import ua.polodarb.ram.data.database.entity.paging.RemoteKey
+import ua.polodarb.ram.data.database.entity.paging.CharacterRemoteKey
 import ua.polodarb.ram.data.database.source.CharactersDbSource
 import ua.polodarb.ram.data.network.model.core.InfoNetworkModel
 import ua.polodarb.ram.data.network.source.NetworkDataSource
@@ -59,18 +59,18 @@ class CharactersRepositoryImpl @Inject constructor(
         dbDataSource.insertCharacters(characters)
     }
 
-    override suspend fun getRemoteKeyByCharacterId(characterId: Int): RemoteKey? {
+    override suspend fun getRemoteKeyByCharacterId(characterId: Int): CharacterRemoteKey? {
         return dbDataSource.getRemoteKeyByCharacterId(characterId)
     }
 
-    override suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, CharacterEntity>): RemoteKey? {
+    override suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, CharacterEntity>): CharacterRemoteKey? {
         return state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()
             ?.let { character ->
                 getRemoteKeyByCharacterId(character.id)
             }
     }
 
-    override suspend fun getRemoteKeyForLastItem(state: PagingState<Int, CharacterEntity>): RemoteKey? {
+    override suspend fun getRemoteKeyForLastItem(state: PagingState<Int, CharacterEntity>): CharacterRemoteKey? {
         return state.pages.lastOrNull { it.data.isNotEmpty() }?.data?.lastOrNull()
             ?.let { character ->
                 getRemoteKeyByCharacterId(character.id)
@@ -79,16 +79,16 @@ class CharactersRepositoryImpl @Inject constructor(
 
     override suspend fun refreshCharactersAndRemoteKeys(
         characters: List<CharacterEntity>,
-        remoteKeys: List<RemoteKey>
+        characterRemoteKeys: List<CharacterRemoteKey>
     ) {
-        dbDataSource.refreshCharactersAndRemoteKeys(characters, remoteKeys)
+        dbDataSource.refreshCharactersAndRemoteKeys(characters, characterRemoteKeys)
     }
 
     override suspend fun insertCharactersAndKeys(
         characters: List<CharacterEntity>,
-        remoteKeys: List<RemoteKey>
+        characterRemoteKeys: List<CharacterRemoteKey>
     ) {
         dbDataSource.insertCharacters(characters)
-        dbDataSource.insertAllRemoteKeys(remoteKeys)
+        dbDataSource.insertAllRemoteKeys(characterRemoteKeys)
     }
 }

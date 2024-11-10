@@ -1,3 +1,3 @@
 <resources>
-    <string name="feature_characters_title">Rick and Morty</string>
+    <string name="feature_characters_search_placeholder">Search by name</string>
 </resources>
