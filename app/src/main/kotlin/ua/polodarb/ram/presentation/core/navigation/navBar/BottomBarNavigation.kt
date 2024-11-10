@@ -19,7 +19,12 @@ import ua.polodarb.ram.presentation.feature.characters.CharactersScreen
 import ua.polodarb.ram.presentation.feature.characters.CharactersViewModel
 import ua.polodarb.ram.presentation.feature.characters.action.CharactersAction
 import ua.polodarb.ram.presentation.feature.characters.mvi.CharactersEffect
+import ua.polodarb.ram.presentation.feature.characters.mvi.CharactersIntent
 import ua.polodarb.ram.presentation.feature.episodes.EpisodesScreen
+import ua.polodarb.ram.presentation.feature.episodes.EpisodesViewModel
+import ua.polodarb.ram.presentation.feature.episodes.action.EpisodesAction
+import ua.polodarb.ram.presentation.feature.episodes.mvi.EpisodesEffect
+import ua.polodarb.ram.presentation.feature.episodes.mvi.EpisodesIntent
 
 @Stable
 @Composable
@@ -29,26 +34,21 @@ internal fun BottomBarNavigation(
     navController: NavHostController,
     paddingValues: PaddingValues
 ) {
-
-    val context = LocalContext.current
-
     NavHost(
         navController = navController,
         startDestination = NavBarItem.Characters.route,
         modifier = modifier
     ) {
         composable(NavBarItem.Characters.route) {
-
             val viewModel = hiltViewModel<CharactersViewModel>()
             val state = viewModel.state.collectAsStateWithLifecycle()
             val effect = viewModel.effect
-
             val snackbarHostState = remember { SnackbarHostState() }
 
             LaunchedEffect(Unit) {
                 effect.collect { effect ->
-                    when (effect) {
-                        is CharactersEffect.ShowSnackbar -> snackbarHostState.showSnackbar(effect.message)
+                    if (effect is CharactersEffect.ShowSnackbar) {
+                        snackbarHostState.showSnackbar(effect.message)
                     }
                 }
             }
@@ -59,29 +59,45 @@ internal fun BottomBarNavigation(
                 parentPaddingValues = paddingValues,
                 onAction = { action ->
                     when (action) {
-                        is CharactersAction.SelectCharacter -> {
-                            parentNavController.navigate(
-                                ScreensDestination.CharacterDetails.getNavDirection(
-                                    action.characterId.toString()
-                                )
-                            )
-                        }
-
+                        is CharactersAction.SelectCharacter -> parentNavController.navigate(
+                            ScreensDestination.CharacterDetails.getNavDirection(action.characterId.toString())
+                        )
                         is CharactersAction.SearchCharacters -> {
-                            viewModel.sendSearchCharactersEvent(action.query)
+                            viewModel.handleIntent(CharactersIntent.SearchCharacters(action.query))
                         }
-
                         is CharactersAction.RefreshCharacters -> {
-                            viewModel.sendLoadCharactersEvent(true)
+                            viewModel.handleIntent(CharactersIntent.RefreshCharacters)
                         }
                     }
-                },
+                }
             )
         }
 
         composable(NavBarItem.Episodes.route) {
+            val viewModel = hiltViewModel<EpisodesViewModel>()
+            val state = viewModel.state.collectAsStateWithLifecycle()
+            val effect = viewModel.effect
+            val snackbarHostState = remember { SnackbarHostState() }
+
+            LaunchedEffect(Unit) {
+                effect.collect { effect ->
+                    if (effect is EpisodesEffect.ShowSnackbar) {
+                        snackbarHostState.showSnackbar(effect.message)
+                    }
+                }
+            }
+
             EpisodesScreen(
-                parentPaddingValues = paddingValues,
+                state = state.value,
+                snackbarHostState = snackbarHostState,
+                onAction = { action ->
+                    when (action) {
+                        is EpisodesAction.SelectEpisode -> parentNavController.navigate(
+                            ScreensDestination.EpisodeDetails.getNavDirection(action.episodeId.toString())
+                        )
+                        is EpisodesAction.RefreshEpisodes -> viewModel.handleIntent(EpisodesIntent.RefreshEpisodes)
+                    }
+                }
             )
         }
     }

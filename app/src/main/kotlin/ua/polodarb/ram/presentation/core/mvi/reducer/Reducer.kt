@@ -1,8 +1,10 @@
-package ua.polodarb.ram.presentation.core.mvi
+package ua.polodarb.ram.presentation.core.mvi.reducer
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import ua.polodarb.ram.presentation.core.mvi.UiState
+import ua.polodarb.ram.presentation.core.mvi.UiEvent
 
 abstract class Reducer<S : UiState, E : UiEvent>(initialVal: S) {
 

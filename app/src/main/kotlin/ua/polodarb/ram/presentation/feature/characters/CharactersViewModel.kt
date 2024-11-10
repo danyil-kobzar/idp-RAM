@@ -7,23 +7,25 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ua.polodarb.ram.domain.usecase.characters.GetCharactersUseCase
 import ua.polodarb.ram.domain.usecase.characters.SearchCharactersUseCase
-import ua.polodarb.ram.presentation.core.mvi.Reducer
+import ua.polodarb.ram.presentation.core.mvi.reducer.Reducer
 import ua.polodarb.ram.presentation.core.platform.base.viewmodel.BaseViewModel
 import ua.polodarb.ram.presentation.feature.characters.mvi.CharactersEffect
 import ua.polodarb.ram.presentation.feature.characters.mvi.CharactersEvent
+import ua.polodarb.ram.presentation.feature.characters.mvi.CharactersIntent
 import ua.polodarb.ram.presentation.feature.characters.mvi.CharactersState
+import ua.polodarb.ram.presentation.feature.episodes.mvi.EpisodesEvent
 import javax.inject.Inject
 
 @HiltViewModel
 class CharactersViewModel @Inject constructor(
     private val getCharactersUseCase: GetCharactersUseCase,
     private val searchCharactersUseCase: SearchCharactersUseCase
-) : BaseViewModel<CharactersState, CharactersEvent, CharactersEffect>(CharactersState.initial()) {
+) : BaseViewModel<CharactersState, CharactersEvent, CharactersEffect, CharactersIntent>(CharactersState.initial()) {
 
     private var searchJob: Job? = null
 
     init {
-        sendLoadCharactersEvent()
+        handleIntent(CharactersIntent.LoadCharacters)
     }
 
     override fun createReducer(initialState: CharactersState): Reducer<CharactersState, CharactersEvent> {
@@ -44,16 +46,27 @@ class CharactersViewModel @Inject constructor(
         }
     }
 
-    fun sendLoadCharactersEvent(forceRefresh: Boolean = false) {
+    override fun handleIntent(intent: CharactersIntent) {
+        when (intent) {
+            is CharactersIntent.LoadCharacters -> sendLoadCharactersEvent(forceRefresh = false)
+            is CharactersIntent.RefreshCharacters -> sendRefreshCharactersEvent()
+            is CharactersIntent.SearchCharacters -> sendSearchCharactersEvent(intent.query)
+        }
+    }
+
+    private fun sendLoadCharactersEvent(forceRefresh: Boolean = false) {
         sendEvent(
             CharactersEvent.ShowLoading(true)
         )
         loadCharacters(forceRefresh)
     }
 
-    fun sendSearchCharactersEvent(query: String) {
+    private fun sendRefreshCharactersEvent() {
+        loadCharacters(forceRefresh = true)
+    }
+
+    private fun sendSearchCharactersEvent(query: String) {
         sendEvent(
-            CharactersEvent.ShowLoading(true),
             CharactersEvent.SearchCharacters(query)
         )
         searchCharacters(query)
@@ -77,38 +90,14 @@ class CharactersViewModel @Inject constructor(
     }
 
     private fun executeSearch(name: String) {
-        try {
-            safeLaunch(
-                onLoading = { isLoading ->
-                    sendEvent(
-                        CharactersEvent.ShowLoading(isLoading),
-                        CharactersEvent.ShowGlobalLoading(isLoading)
-                    )
-                },
-                onResult = { flow ->
-                    flow?.let {
-                        sendEvent(CharactersEvent.LoadCharacters(it))
-                    }
-                },
-                onError = { e ->
-                    sendErrorEvent(e)
-                },
-                request = {
-                    searchCharactersUseCase.invoke(name)
-                }
-            )
-        } catch (e: Exception) {
-            sendErrorEvent(e)
-        }
-    }
-
-    private fun loadCharacters(forceRefresh: Boolean = false) {
-        if (!forceRefresh && state.value.characters != null) return
-
         safeLaunch(
             onLoading = { isLoading ->
                 sendEvent(
                     CharactersEvent.ShowLoading(isLoading),
+                )
+            },
+            onGlobalLoading = { isLoading ->
+                sendEvent(
                     CharactersEvent.ShowGlobalLoading(isLoading)
                 )
             },
@@ -116,6 +105,29 @@ class CharactersViewModel @Inject constructor(
                 flow?.let {
                     sendEvent(CharactersEvent.LoadCharacters(it))
                 }
+            },
+            onError = { e -> sendErrorEvent(e) },
+            request = { searchCharactersUseCase.invoke(name) }
+        )
+    }
+
+    private fun loadCharacters(forceRefresh: Boolean = false) {
+        val showGlobalLoading = !forceRefresh
+        val showLoading = true
+
+        safeLaunch(
+            onLoading = { isLoading ->
+                if (showLoading) {
+                    sendEvent(CharactersEvent.ShowLoading(isLoading))
+                }
+            },
+            onGlobalLoading = { isLoading ->
+                if (showGlobalLoading) {
+                    sendEvent(CharactersEvent.ShowGlobalLoading(isLoading))
+                }
+            },
+            onResult = { flow ->
+                flow?.let { sendEvent(CharactersEvent.LoadCharacters(it)) }
             },
             onError = { e ->
                 sendErrorEvent(e)
@@ -126,6 +138,7 @@ class CharactersViewModel @Inject constructor(
             }
         )
     }
+
 
     private fun resetCharacters() {
         sendLoadCharactersEvent(true)

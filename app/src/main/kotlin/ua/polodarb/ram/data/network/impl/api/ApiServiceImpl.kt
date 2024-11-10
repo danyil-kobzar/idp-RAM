@@ -9,6 +9,7 @@ import ua.polodarb.ram.data.network.api.ApiService
 import ua.polodarb.ram.data.network.core.ApiRoutes
 import ua.polodarb.ram.data.network.model.characters.CharacterNetworkModel
 import ua.polodarb.ram.data.network.model.core.InfoNetworkModel
+import ua.polodarb.ram.data.network.model.episodes.EpisodeNetworkModel
 import javax.inject.Inject
 
 class ApiServiceImpl @Inject constructor() : ApiService {
@@ -25,6 +26,19 @@ class ApiServiceImpl @Inject constructor() : ApiService {
 
             val response: InfoNetworkModel<CharacterNetworkModel> = client.getHttpClient.get {
                 url(finalUrl)
+            }.body()
+            ResultOf.Success(response)
+        } catch (e: Exception) {
+            ResultOf.Error(e)
+        }
+    }
+
+    override suspend fun getAllEpisodes(page: Int): ResultOf<InfoNetworkModel<EpisodeNetworkModel>> {
+        return try {
+            val urlBuilder = "${ApiRoutes.EPISODES}?page=$page"
+
+            val response: InfoNetworkModel<EpisodeNetworkModel> = client.getHttpClient.get {
+                url(urlBuilder)
             }.body()
             ResultOf.Success(response)
         } catch (e: Exception) {

@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import ua.polodarb.ram.data.database.entity.character.CharacterEntity
-import ua.polodarb.ram.data.database.entity.paging.RemoteKey
+import ua.polodarb.ram.data.database.entity.paging.CharacterRemoteKey
 
 @Dao
 interface CharactersDao {
@@ -21,23 +21,23 @@ interface CharactersDao {
     @Query("DELETE FROM characters")
     suspend fun clearAllCharacters()
 
-    @Query("SELECT * FROM remote_keys WHERE characterId = :characterId")
-    suspend fun remoteKeyByCharacterId(characterId: Int): RemoteKey?
+    @Query("SELECT * FROM characters_remote_keys WHERE characterId = :characterId")
+    suspend fun remoteKeyByCharacterId(characterId: Int): CharacterRemoteKey?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllRemoteKeys(remoteKeys: List<RemoteKey>)
+    suspend fun insertAllRemoteKeys(characterRemoteKeys: List<CharacterRemoteKey>)
 
-    @Query("DELETE FROM remote_keys")
+    @Query("DELETE FROM characters_remote_keys")
     suspend fun clearAllRemoteKeys()
 
     @Transaction
     suspend fun refreshCharactersAndRemoteKeys(
         characters: List<CharacterEntity>,
-        remoteKeys: List<RemoteKey>
+        characterRemoteKeys: List<CharacterRemoteKey>
     ) {
         clearAllCharacters()
         clearAllRemoteKeys()
         insertCharacters(characters)
-        insertAllRemoteKeys(remoteKeys)
+        insertAllRemoteKeys(characterRemoteKeys)
     }
 }
