@@ -1,7 +1,6 @@
 package ua.polodarb.ram.presentation.core.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -33,14 +32,16 @@ private fun RootScreenContent(
     childNavController: NavHostController = rememberNavController()
 ) {
     Scaffold(
-        bottomBar = { BottomBarUI(navController = childNavController) }
+        bottomBar = {
+            BottomBarUI(navController = childNavController)
+        }
     ) { paddingValues ->
         BottomBarNavigation(
             parentNavController = parentNavController,
             navController = childNavController,
+            paddingValues = paddingValues,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = paddingValues.calculateBottomPadding())
         )
     }
 }

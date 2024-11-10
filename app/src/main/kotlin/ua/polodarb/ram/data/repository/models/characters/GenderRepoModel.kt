@@ -1,68 +1,54 @@
 package ua.polodarb.ram.data.repository.models.characters
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import ua.polodarb.ram.data.database.entity.GenderEntity
 import ua.polodarb.ram.data.network.model.characters.GenderNetworkModel
+import ua.polodarb.ram.data.repository.models.base.BaseRepoModel
+import ua.polodarb.ram.data.repository.models.base.BaseRepositoryDatabaseMapper
+import ua.polodarb.ram.data.repository.models.base.BaseRepositoryNetworkMapper
 
-enum class GenderRepoModel {
+@Parcelize
+enum class GenderRepoModel : BaseRepoModel, Parcelable {
     FEMALE,
     MALE,
     GENDERLESS,
     UNKNOWN;
 
-    companion object {
+    companion object :
+        BaseRepositoryNetworkMapper<GenderRepoModel, GenderNetworkModel>,
+        BaseRepositoryDatabaseMapper<GenderRepoModel, GenderEntity> {
 
-        fun GenderRepoModel.toNetworkModel(): GenderNetworkModel {
-            return when (this) {
-                GenderRepoModel.FEMALE -> GenderNetworkModel.FEMALE
-                GenderRepoModel.MALE -> GenderNetworkModel.MALE
-                GenderRepoModel.GENDERLESS -> GenderNetworkModel.GENDERLESS
-                GenderRepoModel.UNKNOWN -> GenderNetworkModel.UNKNOWN
+        override fun GenderNetworkModel.toRepository(): GenderRepoModel =
+            when (this) {
+                GenderNetworkModel.FEMALE -> FEMALE
+                GenderNetworkModel.MALE -> MALE
+                GenderNetworkModel.GENDERLESS -> GENDERLESS
+                GenderNetworkModel.UNKNOWN -> UNKNOWN
             }
-        }
 
-        fun GenderNetworkModel.toRepoModel(): GenderRepoModel {
-            return when (this) {
-                GenderNetworkModel.FEMALE -> GenderRepoModel.FEMALE
-                GenderNetworkModel.MALE -> GenderRepoModel.MALE
-                GenderNetworkModel.GENDERLESS -> GenderRepoModel.GENDERLESS
-                GenderNetworkModel.UNKNOWN -> GenderRepoModel.UNKNOWN
+        override fun GenderRepoModel.toNetwork(): GenderNetworkModel =
+            when (this) {
+                FEMALE -> GenderNetworkModel.FEMALE
+                MALE -> GenderNetworkModel.MALE
+                GENDERLESS -> GenderNetworkModel.GENDERLESS
+                UNKNOWN -> GenderNetworkModel.UNKNOWN
             }
-        }
 
-        fun GenderNetworkModel.toEntity(): GenderEntity {
-            return when (this) {
-                GenderNetworkModel.FEMALE -> GenderEntity.FEMALE
-                GenderNetworkModel.MALE -> GenderEntity.MALE
-                GenderNetworkModel.GENDERLESS -> GenderEntity.GENDERLESS
-                GenderNetworkModel.UNKNOWN -> GenderEntity.UNKNOWN
+        override fun GenderEntity.toRepository(): GenderRepoModel =
+            when (this) {
+                GenderEntity.FEMALE -> FEMALE
+                GenderEntity.MALE -> MALE
+                GenderEntity.GENDERLESS -> GENDERLESS
+                GenderEntity.UNKNOWN -> UNKNOWN
             }
-        }
 
-        fun GenderEntity.toNetworkModel(): GenderNetworkModel {
-            return when (this) {
-                GenderEntity.FEMALE -> GenderNetworkModel.FEMALE
-                GenderEntity.MALE -> GenderNetworkModel.MALE
-                GenderEntity.GENDERLESS -> GenderNetworkModel.GENDERLESS
-                GenderEntity.UNKNOWN -> GenderNetworkModel.UNKNOWN
+        override fun GenderRepoModel.toEntity(): GenderEntity =
+            when (this) {
+                FEMALE -> GenderEntity.FEMALE
+                MALE -> GenderEntity.MALE
+                GENDERLESS -> GenderEntity.GENDERLESS
+                UNKNOWN -> GenderEntity.UNKNOWN
             }
-        }
-
-        fun GenderRepoModel.toEntity(): GenderEntity {
-            return when (this) {
-                GenderRepoModel.FEMALE -> GenderEntity.FEMALE
-                GenderRepoModel.MALE -> GenderEntity.MALE
-                GenderRepoModel.GENDERLESS -> GenderEntity.GENDERLESS
-                GenderRepoModel.UNKNOWN -> GenderEntity.UNKNOWN
-            }
-        }
-
-        fun GenderEntity.toRepoModel(): GenderRepoModel {
-            return when (this) {
-                GenderEntity.FEMALE -> GenderRepoModel.FEMALE
-                GenderEntity.MALE -> GenderRepoModel.MALE
-                GenderEntity.GENDERLESS -> GenderRepoModel.GENDERLESS
-                GenderEntity.UNKNOWN -> GenderRepoModel.UNKNOWN
-            }
-        }
     }
 }

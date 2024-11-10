@@ -1,4 +1,4 @@
-package ua.polodarb.ram.data.network.source.base
+package ua.polodarb.ram.presentation.core.platform.error
 
 sealed class ApiExceptions(message: String? = null, cause: Throwable? = null) :
     Exception(message, cause) {

@@ -4,8 +4,6 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import ua.polodarb.ram.data.network.impl.source.NetworkDataSourceImpl
-import ua.polodarb.ram.data.network.source.NetworkDataSource
 import ua.polodarb.ram.data.repository.CharactersRepository
 import ua.polodarb.ram.data.repository.impl.CharactersRepositoryImpl
 

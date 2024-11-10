@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
-//    id("kotlin-kapt")
+    id("kotlin-parcelize")
     alias(libs.plugins.compose.compiler)
     id("dagger.hilt.android.plugin")
 }
@@ -81,6 +81,10 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.hilt.compose)
     ksp(libs.hilt.compiler)
+
+    // Coil
+    implementation("io.coil-kt.coil3:coil-compose:3.0.0-rc02")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0-rc02")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

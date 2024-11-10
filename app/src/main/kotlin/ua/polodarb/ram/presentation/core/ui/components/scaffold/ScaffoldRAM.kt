@@ -1,5 +1,6 @@
 package ua.polodarb.ram.presentation.core.ui.components.scaffold
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.FabPosition
@@ -10,6 +11,7 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import ua.polodarb.ram.presentation.core.mvi.UiState
 import ua.polodarb.ram.presentation.core.ui.components.loader.Loader
 
 @Composable
@@ -23,26 +25,28 @@ fun ScaffoldRAM(
     containerColor: Color = MaterialTheme.colorScheme.background,
     contentColor: Color = contentColorFor(containerColor),
     contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
-    isLoading: Boolean = false,
+    state: UiState = UiState.Default,
     content: @Composable (innerPadding: PaddingValues) -> Unit,
 ) {
-    Loader(
-        isLoading = isLoading, fullScreen = true
-    ) {
-        Scaffold(
-            modifier = modifier,
-            topBar = {
-                topBar()
-            },
-            bottomBar = bottomBar,
-            snackbarHost = snackbarHost,
-            floatingActionButton = floatingActionButton,
-            floatingActionButtonPosition = floatingActionButtonPosition,
-            containerColor = containerColor,
-            contentColor = contentColor,
-            contentWindowInsets = contentWindowInsets,
-        ) {
-            content(it)
+    Crossfade(targetState = state.isGlobalLoading) { isGlobalLoading ->
+        Loader(isLoading = isGlobalLoading, fullScreen = true) {
+            Scaffold(
+                modifier = modifier,
+                topBar = topBar,
+                bottomBar = bottomBar,
+                snackbarHost = snackbarHost,
+                floatingActionButton = floatingActionButton,
+                floatingActionButtonPosition = floatingActionButtonPosition,
+                containerColor = containerColor,
+                contentColor = contentColor,
+                contentWindowInsets = contentWindowInsets,
+            ) {
+                Crossfade(targetState = state.isLoading) { isLoading ->
+                    Loader(isLoading = isLoading, fullScreen = false) {
+                        content(it)
+                    }
+                }
+            }
         }
     }
 }

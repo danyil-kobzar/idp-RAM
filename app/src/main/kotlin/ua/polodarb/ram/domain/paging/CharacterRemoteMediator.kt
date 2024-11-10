@@ -5,62 +5,104 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import jakarta.inject.Inject
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-import ua.polodarb.ram.data.database.entity.CharacterEntity
+import ua.polodarb.ram.common.core.result.ResultOf
+import ua.polodarb.ram.data.database.entity.character.CharacterEntity
+import ua.polodarb.ram.data.database.entity.paging.RemoteKey
 import ua.polodarb.ram.data.repository.CharactersRepository
 import ua.polodarb.ram.data.repository.models.characters.CharacterRepoModel.Companion.toEntity
+import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
 class CharacterRemoteMediator @Inject constructor(
-    private val repository: CharactersRepository
+    private val repository: CharactersRepository,
+    val searchByName: String? = null
 ) : RemoteMediator<Int, CharacterEntity>() {
 
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, CharacterEntity>
-    ): MediatorResult = withContext(Dispatchers.IO) {
-        Log.e("RemoteMediator", "Load triggered with loadType: $loadType")
-
-        val page = when (loadType) {
-            LoadType.REFRESH -> 1
-            LoadType.PREPEND -> {
-                Log.e("RemoteMediator", "PREPEND load type - ending pagination")
-                return@withContext MediatorResult.Success(endOfPaginationReached = true)
-            }
-            LoadType.APPEND -> {
-                val lastItem = state.lastItemOrNull()
-                if (lastItem == null) {
-                    Log.e("RemoteMediator", "APPEND with null lastItem - ending pagination")
-                    return@withContext MediatorResult.Success(endOfPaginationReached = true)
+    ): MediatorResult {
+        try {
+            val page = when (loadType) {
+                LoadType.REFRESH -> 1
+                LoadType.PREPEND -> {
+                    val remoteKeys = getRemoteKeyForFirstItem(state)
+                    val prevKey = remoteKeys?.prevPageKey
+                    prevKey
+                        ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
                 }
-                (lastItem.id / state.config.pageSize) + 1
+
+                LoadType.APPEND -> {
+                    val remoteKeys = getRemoteKeyForLastItem(state)
+                    val nextKey = remoteKeys?.nextPageKey
+                    nextKey
+                        ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
+                }
+            }
+
+            val response = repository.getAllCharacters(page, searchByName)
+
+            return when (response) {
+                is ResultOf.Success -> {
+                    val characters = response.data?.results ?: emptyList()
+                    val endOfPaginationReached = characters.isEmpty()
+
+                    val prevKey = if (page == 1) null else page - 1
+                    val nextKey = if (endOfPaginationReached) null else page + 1
+                    val keys = characters.map {
+                        RemoteKey(characterId = it.id, prevPageKey = prevKey, nextPageKey = nextKey)
+                    }
+                    val charactersToInsert = characters.map { it.toEntity() }
+
+                    delay(3000) // simulate loading state
+
+                    if (loadType == LoadType.REFRESH) {
+                        repository.refreshCharactersAndRemoteKeys(
+                            characters = charactersToInsert,
+                            remoteKeys = keys
+                        )
+                    } else {
+                        repository.insertCharactersAndKeys(
+                            characters = charactersToInsert,
+                            remoteKeys = keys
+                        )
+                    }
+                    MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
+                }
+
+                is ResultOf.Error -> {
+                    if (response.error is java.nio.channels.UnresolvedAddressException) {
+                        MediatorResult.Success(endOfPaginationReached = false)
+                    } else {
+                        MediatorResult.Error(response.error ?: Throwable("UnknownError"))
+                    }
+                }
+
+                is ResultOf.Loading -> MediatorResult.Success(false)
+            }
+
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+            return if (exception is java.nio.channels.UnresolvedAddressException) {
+                MediatorResult.Success(endOfPaginationReached = false)
+            } else {
+                MediatorResult.Error(exception)
             }
         }
+    }
 
-        return@withContext try {
-            val response = repository.getAllCharacters(page)
-            val characters = response.data?.results
-            val isEndOfPagination = response.data?.info?.next == null
+    private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, CharacterEntity>): RemoteKey? {
+        val key = state.pages.lastOrNull { it.data.isNotEmpty() }?.data?.lastOrNull()
+            ?.let { character -> repository.getRemoteKeyByCharacterId(character.id) }
+        Log.e("key", key.toString())
+        return key
+    }
 
-            delay(3000)
-
-            Log.e("RemoteMediator", "Inserting ${characters?.size ?: 0} characters from page $page")
-            if (characters != null) {
-                if (loadType == LoadType.REFRESH) {
-                    Log.e("RemoteMediator", "Clearing database for REFRESH")
-                    repository.clearAllCharacters()
-                }
-                repository.insertCharacters(characters.map { it.toEntity() })
-            }
-
-            MediatorResult.Success(endOfPaginationReached = isEndOfPagination)
-        } catch (e: Exception) {
-            Log.e("RemoteMediator", "Error loading data: ${e.localizedMessage}")
-            MediatorResult.Error(e)
-        }
+    private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, CharacterEntity>): RemoteKey? {
+        val key = state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()
+            ?.let { character -> repository.getRemoteKeyByCharacterId(character.id) }
+        Log.e("key", key.toString())
+        return key
     }
 }

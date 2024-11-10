@@ -1,9 +1,12 @@
-package ua.polodarb.ram.data.database.entity
+package ua.polodarb.ram.data.database.entity.character
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import ua.polodarb.ram.data.database.entity.GenderEntity
+import ua.polodarb.ram.data.database.entity.StatusEntity
+import ua.polodarb.ram.data.database.entity.base.BaseDatabaseModel
 
 @Entity(tableName = "characters")
 data class CharacterEntity(
@@ -15,11 +18,11 @@ data class CharacterEntity(
     @ColumnInfo(name = "species") val species: String,
     @ColumnInfo(name = "type") val type: String,
     @ColumnInfo(name = "gender") val gender: GenderEntity,
-    @Embedded(prefix = "origin_") val origin: CharacterLocationEntity,   // Префикс "origin_"
-    @Embedded(prefix = "location_") val location: CharacterLocationEntity, // Префикс "location_"
+    @Embedded(prefix = "origin_") val origin: CharacterOriginEntity,
+    @Embedded(prefix = "location_") val location: CharacterLocationEntity,
     @ColumnInfo(name = "image") val image: String,
     @ColumnInfo(name = "episode") val episode: List<String>
-)
+) : BaseDatabaseModel
 
 /*
 @Entity(tableName = "characters")

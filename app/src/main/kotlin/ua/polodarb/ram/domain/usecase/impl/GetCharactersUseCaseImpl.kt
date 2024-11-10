@@ -4,12 +4,15 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import jakarta.inject.Inject
+import androidx.paging.map
 import kotlinx.coroutines.flow.Flow
-import ua.polodarb.ram.data.database.entity.CharacterEntity
+import kotlinx.coroutines.flow.map
 import ua.polodarb.ram.data.repository.CharactersRepository
 import ua.polodarb.ram.domain.paging.CharacterRemoteMediator
 import ua.polodarb.ram.domain.usecase.characters.GetCharactersUseCase
+import ua.polodarb.ram.domain.usecase.models.characters.CharacterDomainModel
+import ua.polodarb.ram.domain.usecase.models.characters.CharacterDomainModel.Companion.toDomain
+import javax.inject.Inject
 
 class GetCharactersUseCaseImpl @Inject constructor(
     private val charactersRepository: CharactersRepository,
@@ -17,17 +20,21 @@ class GetCharactersUseCaseImpl @Inject constructor(
 ) : GetCharactersUseCase {
 
     @OptIn(ExperimentalPagingApi::class)
-    override suspend fun invoke(input: Unit): Flow<PagingData<CharacterEntity>> {
+    override suspend fun invoke(input: Unit): Flow<PagingData<CharacterDomainModel>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 20,
-                initialLoadSize = 20,
-                prefetchDistance = 5,
+                initialLoadSize = 40,
+                prefetchDistance = 10,
                 enablePlaceholders = false
             ),
             remoteMediator = remoteMediator
         ) {
             charactersRepository.loadAllCharacters()
-        }.flow
+        }.flow.map { pagingData ->
+            pagingData.map { entity ->
+                entity.toDomain()
+            }
+        }
     }
 }
