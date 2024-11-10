@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import ua.polodarb.ram.data.database.entity.CharacterEntity
+import ua.polodarb.ram.data.database.entity.character.CharacterEntity
 import ua.polodarb.ram.data.database.entity.paging.RemoteKey
 
 @Dao

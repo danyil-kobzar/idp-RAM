@@ -2,7 +2,7 @@ package ua.polodarb.ram.domain.usecase.models.characters
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import ua.polodarb.ram.data.database.entity.CharacterEntity
+import ua.polodarb.ram.data.database.entity.character.CharacterEntity
 import ua.polodarb.ram.data.repository.models.characters.CharacterRepoModel
 import ua.polodarb.ram.domain.usecase.models.base.BaseDomainEntityMapper
 import ua.polodarb.ram.domain.usecase.models.base.BaseDomainModel
@@ -10,6 +10,9 @@ import ua.polodarb.ram.domain.usecase.models.base.BaseDomainRepositoryMapper
 import ua.polodarb.ram.domain.usecase.models.characters.CharacterLocationDomainModel.Companion.toDomain
 import ua.polodarb.ram.domain.usecase.models.characters.CharacterLocationDomainModel.Companion.toEntity
 import ua.polodarb.ram.domain.usecase.models.characters.CharacterLocationDomainModel.Companion.toRepository
+import ua.polodarb.ram.domain.usecase.models.characters.CharacterOriginDomainModel.Companion.toDomain
+import ua.polodarb.ram.domain.usecase.models.characters.CharacterOriginDomainModel.Companion.toEntity
+import ua.polodarb.ram.domain.usecase.models.characters.CharacterOriginDomainModel.Companion.toRepository
 import ua.polodarb.ram.domain.usecase.models.characters.GenderDomainModel.Companion.toDomain
 import ua.polodarb.ram.domain.usecase.models.characters.GenderDomainModel.Companion.toEntity
 import ua.polodarb.ram.domain.usecase.models.characters.GenderDomainModel.Companion.toRepository
@@ -23,7 +26,7 @@ data class CharacterDomainModel(
     val species: String,
     val type: String,
     val gender: GenderDomainModel,
-    val origin: CharacterLocationDomainModel,
+    val origin: CharacterOriginDomainModel,
     val location: CharacterLocationDomainModel,
     val image: String,
     val episode: List<String>,

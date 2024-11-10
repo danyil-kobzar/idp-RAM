@@ -1,4 +1,4 @@
-package ua.polodarb.ram.data.database.entity
+package ua.polodarb.ram.data.database.entity.character
 
 import ua.polodarb.ram.data.database.entity.base.BaseDatabaseModel
 

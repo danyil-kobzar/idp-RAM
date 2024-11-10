@@ -10,7 +10,7 @@ data class CharacterNetworkModel(
     @SerialName("species") val species: String,
     @SerialName("type") val type: String,
     @SerialName("gender") val gender: GenderNetworkModel,
-    @SerialName("origin") val origin: CharacterLocationNetworkModel,
+    @SerialName("origin") val origin: CharacterOriginNetworkModel,
     @SerialName("location") val location: CharacterLocationNetworkModel,
     @SerialName("image") val image: String,
     @SerialName("episode") val episode: List<String>,

@@ -38,6 +38,7 @@ class CharactersViewModel @Inject constructor(
                 is CharactersEvent.LoadCharacters -> updateState(oldState.copy(characters = event.data))
                 is CharactersEvent.ShowLoading -> updateState(oldState.copy(isLoading = event.visibility))
                 is CharactersEvent.ShowGlobalLoading -> updateState(oldState.copy(isGlobalLoading = event.visibility))
+                is CharactersEvent.ShowError -> updateState(oldState.copy(error = event.error))
                 else -> Unit
             }
         }
@@ -45,15 +46,22 @@ class CharactersViewModel @Inject constructor(
 
     fun sendLoadCharactersEvent(forceRefresh: Boolean = false) {
         sendEvent(
-            CharactersEvent.ShowLoading(true),
-//            CharactersEvent.RefreshCharacters
+            CharactersEvent.ShowLoading(true)
         )
         loadCharacters(forceRefresh)
     }
 
     fun sendSearchCharactersEvent(query: String) {
-        sendEvent(CharactersEvent.SearchCharacters(query))
+        sendEvent(
+            CharactersEvent.ShowLoading(true),
+            CharactersEvent.SearchCharacters(query)
+        )
         searchCharacters(query)
+    }
+
+    private fun sendErrorEvent(e: Throwable) {
+        val customUiError = handleException(e)
+        sendEvent(CharactersEvent.ShowError(customUiError))
     }
 
     private fun searchCharacters(name: String) {
@@ -68,44 +76,58 @@ class CharactersViewModel @Inject constructor(
         }
     }
 
-    private suspend fun executeSearch(name: String) {
+    private fun executeSearch(name: String) {
         try {
-            val flow = searchCharactersUseCase.invoke(name)
-            sendEvent(CharactersEvent.LoadCharacters(flow))
+            safeLaunch(
+                onLoading = { isLoading ->
+                    sendEvent(
+                        CharactersEvent.ShowLoading(isLoading),
+                        CharactersEvent.ShowGlobalLoading(isLoading)
+                    )
+                },
+                onResult = { flow ->
+                    flow?.let {
+                        sendEvent(CharactersEvent.LoadCharacters(it))
+                    }
+                },
+                onError = { e ->
+                    sendErrorEvent(e)
+                },
+                request = {
+                    searchCharactersUseCase.invoke(name)
+                }
+            )
         } catch (e: Exception) {
-            handleException(e)
+            sendErrorEvent(e)
         }
     }
 
     private fun loadCharacters(forceRefresh: Boolean = false) {
         if (!forceRefresh && state.value.characters != null) return
 
-        safeLaunch {
-            try {
-                val flow = getCharactersUseCase.invoke(Unit)
+        safeLaunch(
+            onLoading = { isLoading ->
                 sendEvent(
-                    CharactersEvent.LoadCharacters(flow),
-                    CharactersEvent.ShowLoading(false),
-                    CharactersEvent.ShowGlobalLoading(false)
+                    CharactersEvent.ShowLoading(isLoading),
+                    CharactersEvent.ShowGlobalLoading(isLoading)
                 )
-            } catch (e: Exception) {
-                e.printStackTrace()
-                handleException(e)
+            },
+            onResult = { flow ->
+                flow?.let {
+                    sendEvent(CharactersEvent.LoadCharacters(it))
+                }
+            },
+            onError = { e ->
+                sendErrorEvent(e)
+            },
+            request = {
+                delay(1000) // simulate loading state
+                getCharactersUseCase.invoke(Unit)
             }
-        }
+        )
     }
 
     private fun resetCharacters() {
         sendLoadCharactersEvent(true)
-    }
-
-    override fun handleException(exception: Throwable) {
-        sendEffect(CharactersEffect.ShowSnackbar(exception.localizedMessage ?: "Unknown Error"))
-        reducer.updateState(
-            state.value.copy(
-                isLoading = false,
-                errorMessage = exception.localizedMessage
-            )
-        )
     }
 }

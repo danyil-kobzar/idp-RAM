@@ -1,0 +1,8 @@
+<resources>
+    <string name="error_invalid_request">Invalid request. Please check your input.</string>
+    <string name="error_unauthorized_access">Unauthorized access. Please log in.</string>
+    <string name="error_access_forbidden">Access forbidden. You do not have permission.</string>
+    <string name="error_no_network">No network connection. Check your internet settings.</string>
+    <string name="error_unknown">An unknown error occurred.</string>
+    <string name="error_no_data">No data.</string>
+</resources>

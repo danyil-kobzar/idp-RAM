@@ -5,6 +5,7 @@ import io.ktor.client.plugins.ResponseException
 import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import ua.polodarb.ram.presentation.core.platform.error.ApiExceptions
 import java.net.UnknownHostException
 
 interface BaseNetworkSource {
@@ -17,12 +18,8 @@ interface BaseNetworkSource {
                 Log.e("BaseNetworkSource", ex.stackTraceToString(), ex)
                 throw when (ex) {
                     is ResponseException -> handleHttpException(ex.response, ex)
-                    is UnknownHostException -> ApiExceptions.NoNetworkException(
-                        "No internet connection or unknown host",
-                        ex
-                    )
-
-                    else -> ApiExceptions.UnknownApiException(ex.message, ex)
+                    is UnknownHostException -> ApiExceptions.NoNetworkException(cause = ex)
+                    else -> ApiExceptions.UnknownApiException(cause = ex)
                 }
             }
         }
@@ -30,12 +27,12 @@ interface BaseNetworkSource {
 
     private fun handleHttpException(httpResponse: HttpResponse, cause: Throwable): ApiExceptions {
         return when (httpResponse.status.value) {
-            400 -> ApiExceptions.BadRequestException("Bad request exception", cause)
-            401 -> ApiExceptions.UnauthorizedException("Unauthorized exception", cause)
-            403 -> ApiExceptions.ForbiddenException("Forbidden exception", cause)
-            404 -> ApiExceptions.NotFoundException("Host not found", cause)
-            405 -> ApiExceptions.MethodNotAllowedException("Method not allowed", cause)
-            else -> ApiExceptions.UnknownApiException(httpResponse.status.description, cause)
+            400 -> ApiExceptions.BadRequestException(cause = cause)
+            401 -> ApiExceptions.UnauthorizedException(cause = cause)
+            403 -> ApiExceptions.ForbiddenException(cause = cause)
+            404 -> ApiExceptions.NotFoundException(cause = cause)
+            405 -> ApiExceptions.MethodNotAllowedException(cause = cause)
+            else -> ApiExceptions.UnknownApiException(cause = cause)
         }
     }
 }

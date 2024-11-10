@@ -5,8 +5,9 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
+import kotlinx.coroutines.delay
 import ua.polodarb.ram.common.core.result.ResultOf
-import ua.polodarb.ram.data.database.entity.CharacterEntity
+import ua.polodarb.ram.data.database.entity.character.CharacterEntity
 import ua.polodarb.ram.data.database.entity.paging.RemoteKey
 import ua.polodarb.ram.data.repository.CharactersRepository
 import ua.polodarb.ram.data.repository.models.characters.CharacterRepoModel.Companion.toEntity
@@ -53,6 +54,8 @@ class CharacterRemoteMediator @Inject constructor(
                         RemoteKey(characterId = it.id, prevPageKey = prevKey, nextPageKey = nextKey)
                     }
                     val charactersToInsert = characters.map { it.toEntity() }
+
+                    delay(3000) // simulate loading state
 
                     if (loadType == LoadType.REFRESH) {
                         repository.refreshCharactersAndRemoteKeys(

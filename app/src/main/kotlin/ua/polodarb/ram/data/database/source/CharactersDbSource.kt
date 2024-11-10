@@ -1,7 +1,7 @@
 package ua.polodarb.ram.data.database.source
 
 import androidx.paging.PagingSource
-import ua.polodarb.ram.data.database.entity.CharacterEntity
+import ua.polodarb.ram.data.database.entity.character.CharacterEntity
 import ua.polodarb.ram.data.database.entity.paging.RemoteKey
 
 interface CharactersDbSource {

@@ -25,6 +25,7 @@ class KtorClient @Inject constructor() {
             json(Json {
                 prettyPrint = true
                 isLenient = true
+                ignoreUnknownKeys = true
             })
             engine {
                 requestTimeout = TIME_OUT.toLong()

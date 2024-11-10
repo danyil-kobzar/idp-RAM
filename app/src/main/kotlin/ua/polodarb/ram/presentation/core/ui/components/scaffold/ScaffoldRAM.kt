@@ -29,9 +29,7 @@ fun ScaffoldRAM(
     content: @Composable (innerPadding: PaddingValues) -> Unit,
 ) {
     Crossfade(targetState = state.isGlobalLoading) { isGlobalLoading ->
-        if (isGlobalLoading) {
-            Loader(isLoading = true, fullScreen = true) {}
-        } else {
+        Loader(isLoading = isGlobalLoading, fullScreen = true) {
             Scaffold(
                 modifier = modifier,
                 topBar = topBar,
@@ -44,9 +42,7 @@ fun ScaffoldRAM(
                 contentWindowInsets = contentWindowInsets,
             ) {
                 Crossfade(targetState = state.isLoading) { isLoading ->
-                    if (isLoading) {
-                        Loader(isLoading = true, fullScreen = false) {}
-                    } else {
+                    Loader(isLoading = isLoading, fullScreen = false) {
                         content(it)
                     }
                 }

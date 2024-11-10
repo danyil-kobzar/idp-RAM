@@ -2,7 +2,7 @@ package ua.polodarb.ram.data.repository.models.characters
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import ua.polodarb.ram.data.database.entity.CharacterLocationEntity
+import ua.polodarb.ram.data.database.entity.character.CharacterLocationEntity
 import ua.polodarb.ram.data.network.model.characters.CharacterLocationNetworkModel
 import ua.polodarb.ram.data.repository.models.base.BaseRepoModel
 import ua.polodarb.ram.data.repository.models.base.BaseRepositoryDatabaseMapper

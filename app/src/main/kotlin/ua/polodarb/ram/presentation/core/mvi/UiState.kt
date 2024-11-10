@@ -3,6 +3,7 @@ package ua.polodarb.ram.presentation.core.mvi
 interface UiState {
     val isLoading: Boolean
     val isGlobalLoading: Boolean
+    val error: Throwable?
 
     companion object {
         val Default = object : UiState {
@@ -11,6 +12,9 @@ interface UiState {
 
             override val isGlobalLoading: Boolean
                 get() = false
+
+            override val error: Throwable?
+                get() = null
         }
     }
 }

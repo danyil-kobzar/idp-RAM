@@ -23,7 +23,7 @@ fun CharactersTopBar(
         modifier = modifier.background(MaterialTheme.colorScheme.background)
     ) {
         PrimaryTopBar(
-            title = UiText.StringResource(R.string.feaure_characters_title)
+            title = UiText.StringResource(R.string.feature_characters_title)
         )
         AnimatedVisibility(
             visible = isSearchBarVisible?.invoke() ?: true

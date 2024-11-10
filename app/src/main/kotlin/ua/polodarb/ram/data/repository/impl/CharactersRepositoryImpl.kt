@@ -3,7 +3,7 @@ package ua.polodarb.ram.data.repository.impl
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ua.polodarb.ram.common.core.result.ResultOf
-import ua.polodarb.ram.data.database.entity.CharacterEntity
+import ua.polodarb.ram.data.database.entity.character.CharacterEntity
 import ua.polodarb.ram.data.database.entity.paging.RemoteKey
 import ua.polodarb.ram.data.database.source.CharactersDbSource
 import ua.polodarb.ram.data.network.model.core.InfoNetworkModel

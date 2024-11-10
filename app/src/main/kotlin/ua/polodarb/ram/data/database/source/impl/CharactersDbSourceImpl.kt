@@ -2,7 +2,7 @@ package ua.polodarb.ram.data.database.source.impl
 
 import androidx.paging.PagingSource
 import ua.polodarb.ram.data.database.dao.CharactersDao
-import ua.polodarb.ram.data.database.entity.CharacterEntity
+import ua.polodarb.ram.data.database.entity.character.CharacterEntity
 import ua.polodarb.ram.data.database.entity.paging.RemoteKey
 import ua.polodarb.ram.data.database.source.CharactersDbSource
 import javax.inject.Inject

@@ -2,7 +2,7 @@ package ua.polodarb.ram.data.repository.models.characters
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import ua.polodarb.ram.data.database.entity.CharacterEntity
+import ua.polodarb.ram.data.database.entity.character.CharacterEntity
 import ua.polodarb.ram.data.network.model.characters.CharacterNetworkModel
 import ua.polodarb.ram.data.repository.models.base.BaseRepoModel
 import ua.polodarb.ram.data.repository.models.base.BaseRepositoryDatabaseMapper
@@ -10,6 +10,9 @@ import ua.polodarb.ram.data.repository.models.base.BaseRepositoryNetworkMapper
 import ua.polodarb.ram.data.repository.models.characters.CharacterLocationRepoModel.Companion.toEntity
 import ua.polodarb.ram.data.repository.models.characters.CharacterLocationRepoModel.Companion.toNetwork
 import ua.polodarb.ram.data.repository.models.characters.CharacterLocationRepoModel.Companion.toRepository
+import ua.polodarb.ram.data.repository.models.characters.CharacterOriginRepoModel.Companion.toEntity
+import ua.polodarb.ram.data.repository.models.characters.CharacterOriginRepoModel.Companion.toNetwork
+import ua.polodarb.ram.data.repository.models.characters.CharacterOriginRepoModel.Companion.toRepository
 import ua.polodarb.ram.data.repository.models.characters.GenderRepoModel.Companion.toEntity
 import ua.polodarb.ram.data.repository.models.characters.GenderRepoModel.Companion.toNetwork
 import ua.polodarb.ram.data.repository.models.characters.GenderRepoModel.Companion.toRepository
@@ -23,7 +26,7 @@ data class CharacterRepoModel(
     val species: String,
     val type: String,
     val gender: GenderRepoModel,
-    val origin: CharacterLocationRepoModel,
+    val origin: CharacterOriginRepoModel,
     val location: CharacterLocationRepoModel,
     val image: String,
     val episode: List<String>,
