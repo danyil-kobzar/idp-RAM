@@ -94,7 +94,8 @@ class CharactersViewModel @Inject constructor(
     private fun loadGridColumnCount() {
         viewModelScope.launch {
             val columnCount = loadGridColumnCountUseCase.invoke(Unit)
-            sendEvent(CharactersEvent.UpdateGridColumnCount(columnCount))
+            val checkedValue = columnCount.coerceAtLeast(1)
+            sendEvent(CharactersEvent.UpdateGridColumnCount(checkedValue))
         }
     }
 
