@@ -1,4 +1,4 @@
-package ua.polodarb.ram
+package ua.polodarb.ram.presentation.feature.application
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

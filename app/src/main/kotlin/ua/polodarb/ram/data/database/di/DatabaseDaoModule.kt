@@ -18,6 +18,4 @@ class DatabaseDaoModule {
     @Provides
     fun bindEpisodesDao(database: AppDatabase): EpisodesDao = database.episodesDao()
 
-//    @Provides
-//    fun bindRemoteKeyDao(database: AppDatabase): RemoteKeyDao = database.remoteKeyDao()
 }

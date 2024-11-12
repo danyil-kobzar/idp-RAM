@@ -7,25 +7,31 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ua.polodarb.ram.domain.usecase.characters.GetCharactersUseCase
 import ua.polodarb.ram.domain.usecase.characters.SearchCharactersUseCase
+import ua.polodarb.ram.domain.usecase.preferences.LoadGridColumnCountUseCase
+import ua.polodarb.ram.domain.usecase.preferences.SaveGridColumnCountUseCase
 import ua.polodarb.ram.presentation.core.mvi.reducer.Reducer
 import ua.polodarb.ram.presentation.core.platform.base.viewmodel.BaseViewModel
 import ua.polodarb.ram.presentation.feature.characters.mvi.CharactersEffect
 import ua.polodarb.ram.presentation.feature.characters.mvi.CharactersEvent
 import ua.polodarb.ram.presentation.feature.characters.mvi.CharactersIntent
 import ua.polodarb.ram.presentation.feature.characters.mvi.CharactersState
-import ua.polodarb.ram.presentation.feature.episodes.mvi.EpisodesEvent
 import javax.inject.Inject
 
 @HiltViewModel
 class CharactersViewModel @Inject constructor(
     private val getCharactersUseCase: GetCharactersUseCase,
-    private val searchCharactersUseCase: SearchCharactersUseCase
-) : BaseViewModel<CharactersState, CharactersEvent, CharactersEffect, CharactersIntent>(CharactersState.initial()) {
+    private val searchCharactersUseCase: SearchCharactersUseCase,
+    private val saveGridColumnCountUseCase: SaveGridColumnCountUseCase,
+    private val loadGridColumnCountUseCase: LoadGridColumnCountUseCase
+) : BaseViewModel<CharactersState, CharactersEvent, CharactersEffect, CharactersIntent>(
+    CharactersState.initial()
+) {
 
     private var searchJob: Job? = null
 
     init {
         handleIntent(CharactersIntent.LoadCharacters)
+        handleIntent(CharactersIntent.LoadGridColumnCount)
     }
 
     override fun createReducer(initialState: CharactersState): Reducer<CharactersState, CharactersEvent> {
@@ -41,6 +47,12 @@ class CharactersViewModel @Inject constructor(
                 is CharactersEvent.ShowLoading -> updateState(oldState.copy(isLoading = event.visibility))
                 is CharactersEvent.ShowGlobalLoading -> updateState(oldState.copy(isGlobalLoading = event.visibility))
                 is CharactersEvent.ShowError -> updateState(oldState.copy(error = event.error))
+                is CharactersEvent.UpdateGridColumnCount -> updateState(
+                    oldState.copy(
+                        gridColumnCount = event.count
+                    )
+                )
+
                 else -> Unit
             }
         }
@@ -51,6 +63,8 @@ class CharactersViewModel @Inject constructor(
             is CharactersIntent.LoadCharacters -> sendLoadCharactersEvent(forceRefresh = false)
             is CharactersIntent.RefreshCharacters -> sendRefreshCharactersEvent()
             is CharactersIntent.SearchCharacters -> sendSearchCharactersEvent(intent.query)
+            is CharactersIntent.LoadGridColumnCount -> loadGridColumnCount()
+            is CharactersIntent.SaveGridColumnCount -> saveGridColumnCount(count = intent.count)
         }
     }
 
@@ -75,6 +89,20 @@ class CharactersViewModel @Inject constructor(
     private fun sendErrorEvent(e: Throwable) {
         val customUiError = handleException(e)
         sendEvent(CharactersEvent.ShowError(customUiError))
+    }
+
+    private fun loadGridColumnCount() {
+        viewModelScope.launch {
+            val columnCount = loadGridColumnCountUseCase.invoke(Unit)
+            sendEvent(CharactersEvent.UpdateGridColumnCount(columnCount))
+        }
+    }
+
+    private fun saveGridColumnCount(count: Int) {
+        viewModelScope.launch {
+            saveGridColumnCountUseCase.invoke(count)
+            sendEvent(CharactersEvent.UpdateGridColumnCount(count))
+        }
     }
 
     private fun searchCharacters(name: String) {

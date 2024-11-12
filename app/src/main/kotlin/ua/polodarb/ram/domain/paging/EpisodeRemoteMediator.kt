@@ -7,11 +7,13 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import kotlinx.coroutines.delay
 import ua.polodarb.ram.common.core.result.ResultOf
-import ua.polodarb.ram.data.database.entity.EpisodeEntity
+import ua.polodarb.ram.data.database.entity.episodes.EpisodeEntity
+import ua.polodarb.ram.data.database.entity.episodes.SeasonEntity
 import ua.polodarb.ram.data.database.entity.paging.EpisodesRemoteKey
 import ua.polodarb.ram.data.repository.EpisodesRepository
-import ua.polodarb.ram.data.repository.models.characters.CharacterRepoModel.Companion.toEntity
 import ua.polodarb.ram.data.repository.models.episodes.EpisodeRepoModel.Companion.toEntity
+import ua.polodarb.ram.data.repository.models.episodes.EpisodeRepoModel.Companion.toRepository
+import ua.polodarb.ram.data.repository.models.episodes.SeasonRepoModel.Companion.toRepository
 import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
@@ -51,20 +53,35 @@ class EpisodeRemoteMediator @Inject constructor(
                     val prevKey = if (page == 1) null else page - 1
                     val nextKey = if (endOfPaginationReached) null else page + 1
                     val keys = episodes.map {
-                        EpisodesRemoteKey(episodeId = it.id, prevPageKey = prevKey, nextPageKey = nextKey)
+                        EpisodesRemoteKey(
+                            episodeId = it.id,
+                            prevPageKey = prevKey,
+                            nextPageKey = nextKey
+                        )
                     }
-                    val episodesToInsert = episodes.map { it.toEntity() }
+
+                    val seasonEntities = episodes.map { episode ->
+                        val seasonNumber = episode.episode.substring(1, 3).toInt()
+                        SeasonEntity(seasonId = seasonNumber, seasonNumber = seasonNumber)
+                    }.distinctBy { it.seasonNumber }
+
+                    val episodesToInsert = episodes.map {
+                        val seasonNumber = it.episode.substring(1, 3).toInt()
+                        it.toEntity(seasonId = seasonNumber)
+                    }
 
                     delay(1000) // simulate loading state
 
                     if (loadType == LoadType.REFRESH) {
                         repository.refreshEpisodesAndRemoteKeys(
                             episodes = episodesToInsert,
+                            seasons = seasonEntities,
                             episodeRemoteKeys = keys
                         )
                     } else {
                         repository.insertEpisodesAndKeys(
-                            episodes = episodesToInsert,
+                            episodes = episodesToInsert.map { it.toRepository() },
+                            seasons = seasonEntities.map { it.toRepository() },
                             episodeRemoteKeys = keys
                         )
                     }
@@ -94,14 +111,14 @@ class EpisodeRemoteMediator @Inject constructor(
 
     private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, EpisodeEntity>): EpisodesRemoteKey? {
         val key = state.pages.lastOrNull { it.data.isNotEmpty() }?.data?.lastOrNull()
-            ?.let { episode -> repository.getRemoteKeyByEpisodeId(episode.id) }
+            ?.let { episode -> repository.loadRemoteKeyByEpisodeId(episode.id) }
         Log.e("key", key.toString())
         return key
     }
 
     private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, EpisodeEntity>): EpisodesRemoteKey? {
         val key = state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()
-            ?.let { episode -> repository.getRemoteKeyByEpisodeId(episode.id) }
+            ?.let { episode -> repository.loadRemoteKeyByEpisodeId(episode.id) }
         Log.e("key", key.toString())
         return key
     }

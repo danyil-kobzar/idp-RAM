@@ -7,7 +7,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -62,11 +61,17 @@ internal fun BottomBarNavigation(
                         is CharactersAction.SelectCharacter -> parentNavController.navigate(
                             ScreensDestination.CharacterDetails.getNavDirection(action.characterId.toString())
                         )
+
                         is CharactersAction.SearchCharacters -> {
                             viewModel.handleIntent(CharactersIntent.SearchCharacters(action.query))
                         }
+
                         is CharactersAction.RefreshCharacters -> {
                             viewModel.handleIntent(CharactersIntent.RefreshCharacters)
+                        }
+
+                        is CharactersAction.UpdateGridColumnCount -> {
+                            viewModel.handleIntent(CharactersIntent.SaveGridColumnCount(action.count))
                         }
                     }
                 }
@@ -95,6 +100,7 @@ internal fun BottomBarNavigation(
                         is EpisodesAction.SelectEpisode -> parentNavController.navigate(
                             ScreensDestination.EpisodeDetails.getNavDirection(action.episodeId.toString())
                         )
+
                         is EpisodesAction.RefreshEpisodes -> viewModel.handleIntent(EpisodesIntent.RefreshEpisodes)
                     }
                 }

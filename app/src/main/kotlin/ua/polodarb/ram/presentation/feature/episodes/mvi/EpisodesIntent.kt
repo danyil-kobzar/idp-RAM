@@ -4,5 +4,6 @@ import ua.polodarb.ram.presentation.core.mvi.UiIntent
 
 sealed class EpisodesIntent : UiIntent {
     data object LoadEpisodes : EpisodesIntent()
+    data object LoadSeasons : EpisodesIntent()
     data object RefreshEpisodes : EpisodesIntent()
 }

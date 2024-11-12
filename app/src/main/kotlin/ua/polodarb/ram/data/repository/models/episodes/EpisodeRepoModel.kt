@@ -2,7 +2,7 @@ package ua.polodarb.ram.data.repository.models.episodes
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import ua.polodarb.ram.data.database.entity.EpisodeEntity
+import ua.polodarb.ram.data.database.entity.episodes.EpisodeEntity
 import ua.polodarb.ram.data.network.model.episodes.EpisodeNetworkModel
 import ua.polodarb.ram.data.repository.models.base.BaseRepoModel
 import ua.polodarb.ram.data.repository.models.base.BaseRepositoryDatabaseMapper
@@ -60,6 +60,7 @@ data class EpisodeRepoModel(
         }
 
         override fun EpisodeRepoModel.toEntity(): EpisodeEntity {
+            val seasonNumber = this.episode.substring(1, 3).toInt()
             return EpisodeEntity(
                 id = this.id,
                 name = this.name,
@@ -67,7 +68,21 @@ data class EpisodeRepoModel(
                 created = this.created,
                 airDate = this.airDate,
                 episode = this.episode,
-                characters = this.characters
+                characters = this.characters,
+                seasonId = seasonNumber
+            )
+        }
+
+        fun EpisodeRepoModel.toEntity(seasonId: Int): EpisodeEntity {
+            return EpisodeEntity(
+                id = this.id,
+                name = this.name,
+                url = this.url,
+                created = this.created,
+                airDate = this.airDate,
+                episode = this.episode,
+                characters = this.characters,
+                seasonId = seasonId
             )
         }
     }

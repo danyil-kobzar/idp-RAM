@@ -7,10 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import ua.polodarb.ram.presentation.core.navigation.utils.composableRAM
-import ua.polodarb.ram.presentation.feature.characterDetails.CharacterDetailsScreen
-import ua.polodarb.ram.presentation.feature.episodeDetails.EpisodeDetailsScreen
 
 @Composable
 fun RootAppNavigation(
@@ -25,20 +22,6 @@ fun RootAppNavigation(
     ) {
         composableRAM(route = ScreensDestination.Root.route) {
             RootScreen(parentNavController = navController)
-        }
-
-        composable(
-            route = ScreensDestination.CharacterDetails.route,
-        ) {
-            CharacterDetailsScreen {
-                // todo
-            }
-        }
-
-        composable(route = ScreensDestination.EpisodeDetails.route) {
-            EpisodeDetailsScreen {
-                // todo
-            }
         }
     }
 }

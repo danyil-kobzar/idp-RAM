@@ -9,15 +9,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ua.polodarb.ram.data.repository.EpisodesRepository
 import ua.polodarb.ram.domain.paging.EpisodeRemoteMediator
-import ua.polodarb.ram.domain.usecase.episodes.GetEpisodesUseCase
+import ua.polodarb.ram.domain.usecase.episodes.LoadEpisodesUseCase
 import ua.polodarb.ram.domain.usecase.models.episodes.EpisodeDomainModel
 import ua.polodarb.ram.domain.usecase.models.episodes.EpisodeDomainModel.Companion.toDomain
 import javax.inject.Inject
 
-class GetEpisodesUseCaseImpl @Inject constructor(
+class LoadEpisodesUseCaseImpl @Inject constructor(
     private val episodesRepository: EpisodesRepository,
     private val remoteMediator: EpisodeRemoteMediator
-) : GetEpisodesUseCase {
+) : LoadEpisodesUseCase {
 
     @OptIn(ExperimentalPagingApi::class)
     override suspend fun invoke(input: Unit): Flow<PagingData<EpisodeDomainModel>> {

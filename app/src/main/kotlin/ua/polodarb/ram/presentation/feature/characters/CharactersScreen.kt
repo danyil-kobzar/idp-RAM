@@ -1,6 +1,8 @@
 package ua.polodarb.ram.presentation.feature.characters
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +40,7 @@ import ua.polodarb.ram.presentation.core.ui.components.card.CharacterCard
 import ua.polodarb.ram.presentation.core.ui.components.pagination.LazyPaginationStateHandler
 import ua.polodarb.ram.presentation.core.ui.components.refresh.PullToRefreshWrapper
 import ua.polodarb.ram.presentation.core.ui.components.scaffold.ScaffoldRAM
+import ua.polodarb.ram.presentation.core.ui.components.selector.CellsSelector
 import ua.polodarb.ram.presentation.feature.characters.action.CharactersAction
 import ua.polodarb.ram.presentation.feature.characters.components.CharactersTopBar
 import ua.polodarb.ram.presentation.feature.characters.mvi.CharactersState
@@ -62,6 +65,8 @@ fun CharactersScreen(
         }
     }
 
+    val columnOptions = listOf(1, 2, 3)
+
     if (pullToRefreshState.isRefreshing) {
         LaunchedEffect(true) {
             onAction?.invoke(CharactersAction.RefreshCharacters)
@@ -75,18 +80,29 @@ fun CharactersScreen(
         state = state,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            CharactersTopBar(
-                isSearchBarVisible = { isSearchBarVisibleState },
-                searchBarQuery = searchQuery,
-                onSearchBarQueryChanged = {
-                    searchQuery = it
-                    onAction?.invoke(CharactersAction.SearchCharacters(it))
-                },
-                onActionClick = {
-                    searchQuery = String.Empty
-                    onAction?.invoke(CharactersAction.SearchCharacters(searchQuery))
-                }
-            )
+            Column {
+                CharactersTopBar(
+                    isSearchBarVisible = { isSearchBarVisibleState },
+                    searchBarQuery = searchQuery,
+                    onSearchBarQueryChanged = {
+                        searchQuery = it
+                        onAction?.invoke(CharactersAction.SearchCharacters(it))
+                    },
+                    onActionClick = {
+                        searchQuery = String.Empty
+                        onAction?.invoke(CharactersAction.SearchCharacters(searchQuery))
+                    },
+                    additionalContent = {
+                        CellsSelector(
+                            options = columnOptions,
+                            selectedOption = state.gridColumnCount,
+                            onOptionSelected = { option ->
+                                onAction?.invoke(CharactersAction.UpdateGridColumnCount(option))
+                            }
+                        )
+                    }
+                )
+            }
         }
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -117,40 +133,42 @@ fun CharactersScreen(
                 }
 
                 characters != null -> {
-                    LazyVerticalStaggeredGrid(
-                        state = lazyStaggeredGridState,
-                        columns = StaggeredGridCells.Fixed(2),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 8.dp)
-                            .nestedScroll(pullToRefreshState.nestedScrollConnection),
-                        contentPadding = PaddingValues(
-                            top = it.calculateTopPadding(),
-                            bottom = parentPaddingValues?.calculateBottomPadding()
-                                ?: it.calculateBottomPadding()
-                        )
-                    ) {
-                        items(
-                            count = characters.itemCount,
-                            key = characters.itemKey { index -> index }
-                        ) { index ->
-                            val character = characters[index]
-                            character?.let { characterItem ->
-                                CharacterCard(
-                                    character = characterItem,
-                                    onCharacterClick = { characterId ->
-                                        onAction?.invoke(
-                                            CharactersAction.SelectCharacter(characterId)
-                                        )
-                                    }
-                                )
+                    Crossfade(state.gridColumnCount) { cells ->
+                        LazyVerticalStaggeredGrid(
+                            state = lazyStaggeredGridState,
+                            columns = StaggeredGridCells.Fixed(cells),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 8.dp)
+                                .nestedScroll(pullToRefreshState.nestedScrollConnection),
+                            contentPadding = PaddingValues(
+                                top = it.calculateTopPadding(),
+                                bottom = parentPaddingValues?.calculateBottomPadding()
+                                    ?: it.calculateBottomPadding()
+                            )
+                        ) {
+                            items(
+                                count = characters.itemCount,
+                                key = characters.itemKey { index -> index }
+                            ) { index ->
+                                val character = characters[index]
+                                character?.let { characterItem ->
+                                    CharacterCard(
+                                        character = characterItem,
+                                        onCharacterClick = { characterId ->
+                                            onAction?.invoke(
+                                                CharactersAction.SelectCharacter(characterId)
+                                            )
+                                        }
+                                    )
+                                }
                             }
-                        }
 
-                        LazyPaginationStateHandler(loadState = characters.loadState)
+                            LazyPaginationStateHandler(loadState = characters.loadState)
 
-                        item {
-                            Spacer(modifier = Modifier.size(96.dp))
+                            item {
+                                Spacer(modifier = Modifier.size(96.dp))
+                            }
                         }
                     }
 

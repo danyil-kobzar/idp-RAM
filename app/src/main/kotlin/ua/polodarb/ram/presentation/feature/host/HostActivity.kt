@@ -1,4 +1,4 @@
-package ua.polodarb.ram
+package ua.polodarb.ram.presentation.feature.host
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

@@ -8,8 +8,10 @@ import ua.polodarb.ram.data.network.model.base.BaseNetworkModel
 enum class StatusNetworkModel : BaseNetworkModel {
     @SerialName("Alive")
     ALIVE,
+
     @SerialName("Dead")
     DEAD,
+
     @SerialName("unknown")
     UNKNOWN
 }
