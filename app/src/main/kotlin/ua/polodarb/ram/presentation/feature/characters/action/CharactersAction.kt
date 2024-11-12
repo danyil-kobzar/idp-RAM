@@ -6,11 +6,6 @@ import kotlinx.serialization.Serializable
 sealed class CharactersAction {
 
     @Serializable
-    data class SelectCharacter(
-        val characterId: Int,
-    ) : CharactersAction()
-
-    @Serializable
     data class SearchCharacters(
         val query: String,
     ) : CharactersAction()

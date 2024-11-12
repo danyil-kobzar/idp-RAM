@@ -58,10 +58,6 @@ internal fun BottomBarNavigation(
                 parentPaddingValues = paddingValues,
                 onAction = { action ->
                     when (action) {
-                        is CharactersAction.SelectCharacter -> parentNavController.navigate(
-                            ScreensDestination.CharacterDetails.getNavDirection(action.characterId.toString())
-                        )
-
                         is CharactersAction.SearchCharacters -> {
                             viewModel.handleIntent(CharactersIntent.SearchCharacters(action.query))
                         }
@@ -97,10 +93,6 @@ internal fun BottomBarNavigation(
                 snackbarHostState = snackbarHostState,
                 onAction = { action ->
                     when (action) {
-                        is EpisodesAction.SelectEpisode -> parentNavController.navigate(
-                            ScreensDestination.EpisodeDetails.getNavDirection(action.episodeId.toString())
-                        )
-
                         is EpisodesAction.RefreshEpisodes -> viewModel.handleIntent(EpisodesIntent.RefreshEpisodes)
                     }
                 }
