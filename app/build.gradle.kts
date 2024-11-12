@@ -1,3 +1,6 @@
+import org.gradle.configurationcache.extensions.capitalized
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +9,8 @@ plugins {
     id("kotlin-parcelize")
     alias(libs.plugins.compose.compiler)
     id("dagger.hilt.android.plugin")
+    id("com.google.protobuf")
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -52,6 +57,16 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    androidComponents {
+        onVariants(selector().all()) { variant ->
+            afterEvaluate {
+                val capName = variant.name.capitalized()
+                tasks.getByName<KotlinCompile>("ksp${capName}Kotlin") {
+                    setSource(tasks.getByName("generate${capName}Proto").outputs)
+                }
+            }
+        }
+    }
 }
 
 dependencies {
@@ -82,9 +97,15 @@ dependencies {
     implementation(libs.hilt.compose)
     ksp(libs.hilt.compiler)
 
+    // Proto DS
+    implementation(libs.androidx.datastore.core)
+    implementation(libs.protobuf.javalite)
+    implementation(libs.protobuf.kotlinlite)
+    implementation(libs.datastore)
+
     // Coil
-    implementation("io.coil-kt.coil3:coil-compose:3.0.0-rc02")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0-rc02")
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -101,4 +122,22 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.20.1"
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                register("java") {
+                    option("lite")
+                }
+                register("kotlin") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }

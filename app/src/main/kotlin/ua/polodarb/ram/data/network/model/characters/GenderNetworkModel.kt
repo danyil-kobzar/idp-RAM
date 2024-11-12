@@ -8,10 +8,13 @@ import ua.polodarb.ram.data.network.model.base.BaseNetworkModel
 enum class GenderNetworkModel : BaseNetworkModel {
     @SerialName("Female")
     FEMALE,
+
     @SerialName("Male")
     MALE,
+
     @SerialName("Genderless")
     GENDERLESS,
+
     @SerialName("unknown")
     UNKNOWN
 }

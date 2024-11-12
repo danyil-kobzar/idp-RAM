@@ -4,8 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.IconButton
@@ -14,7 +12,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import ua.polodarb.idp_ram.R
 import ua.polodarb.ram.presentation.core.localization.UiText
 
@@ -30,7 +27,11 @@ fun SearchBar(
         onValueChange = onValueChanged,
         maxLines = 1,
         singleLine = true,
-        label = { Text(UiText.StringResource(R.string.feature_characters_search_placeholder).asString()) },
+        label = {
+            Text(
+                UiText.StringResource(R.string.feature_characters_search_placeholder).asString()
+            )
+        },
         shape = MaterialTheme.shapes.extraLarge,
         trailingIcon = {
             AnimatedVisibility(
@@ -49,7 +50,5 @@ fun SearchBar(
             }
         },
         modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
     )
 }

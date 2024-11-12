@@ -1,4 +1,4 @@
-package ua.polodarb.ram.data.database.entity
+package ua.polodarb.ram.data.database.entity.episodes
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -14,4 +14,5 @@ data class EpisodeEntity(
     @ColumnInfo(name = "air_date") val airDate: String,
     @ColumnInfo(name = "episode") val episode: String,
     @ColumnInfo(name = "characters") val characters: List<String>,
+    @ColumnInfo(name = "seasonId") val seasonId: Int
 ) : BaseDatabaseModel

@@ -8,6 +8,8 @@ import ua.polodarb.ram.data.database.entity.paging.CharacterRemoteKey
 import ua.polodarb.ram.data.database.source.CharactersDbSource
 import ua.polodarb.ram.data.network.model.core.InfoNetworkModel
 import ua.polodarb.ram.data.network.source.NetworkDataSource
+import ua.polodarb.ram.data.preference.datasource.CellsCountPreferenceDataSource
+import ua.polodarb.ram.data.preference.model.CellsCountPreferenceModel
 import ua.polodarb.ram.data.repository.CharactersRepository
 import ua.polodarb.ram.data.repository.models.characters.CharacterRepoModel
 import ua.polodarb.ram.data.repository.models.characters.CharacterRepoModel.Companion.toRepository
@@ -16,6 +18,7 @@ import javax.inject.Inject
 class CharactersRepositoryImpl @Inject constructor(
     private val netDataSource: NetworkDataSource,
     private val dbDataSource: CharactersDbSource,
+    private val cellsCountPreferenceDataSource: CellsCountPreferenceDataSource
 ) : CharactersRepository {
 
     override suspend fun getAllCharacters(
@@ -91,4 +94,13 @@ class CharactersRepositoryImpl @Inject constructor(
         dbDataSource.insertCharacters(characters)
         dbDataSource.insertAllRemoteKeys(characterRemoteKeys)
     }
+
+    override suspend fun saveGridColumnCount(count: Int) {
+        cellsCountPreferenceDataSource.updateData(CellsCountPreferenceModel(count))
+    }
+
+    override suspend fun loadGridColumnCount(): Int {
+        return cellsCountPreferenceDataSource.getData()?.cellsCount ?: 2
+    }
+
 }

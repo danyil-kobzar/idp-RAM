@@ -17,4 +17,9 @@ sealed class CharactersAction {
 
     @Serializable
     data object RefreshCharacters : CharactersAction()
+
+    @Serializable
+    data class UpdateGridColumnCount(
+        val count: Int
+    ) : CharactersAction()
 }

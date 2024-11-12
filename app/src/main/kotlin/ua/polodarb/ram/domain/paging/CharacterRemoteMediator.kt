@@ -31,17 +31,21 @@ class CharacterRemoteMediator @Inject constructor(
                     Log.d("RemoteMediator", "LoadType.REFRESH")
                     1
                 }
+
                 LoadType.PREPEND -> {
                     Log.d("RemoteMediator", "LoadType.PREPEND")
                     val remoteKeys = getRemoteKeyForFirstItem(state)
                     val prevKey = remoteKeys?.prevPageKey
-                    prevKey ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
+                    prevKey
+                        ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
                 }
+
                 LoadType.APPEND -> {
                     Log.d("RemoteMediator", "LoadType.APPEND")
                     val remoteKeys = getRemoteKeyForLastItem(state)
                     val nextKey = remoteKeys?.nextPageKey
-                    nextKey ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
+                    nextKey
+                        ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
                 }
             }
 
@@ -55,7 +59,11 @@ class CharacterRemoteMediator @Inject constructor(
                     val prevKey = if (page == 1) null else page - 1
                     val nextKey = if (endOfPaginationReached) null else page + 1
                     val keys = characters.map {
-                        CharacterRemoteKey(characterId = it.id, prevPageKey = prevKey, nextPageKey = nextKey)
+                        CharacterRemoteKey(
+                            characterId = it.id,
+                            prevPageKey = prevKey,
+                            nextPageKey = nextKey
+                        )
                     }
                     val charactersToInsert = characters.map { it.toEntity() }
 
@@ -78,7 +86,10 @@ class CharacterRemoteMediator @Inject constructor(
                 }
 
                 is ResultOf.Error -> {
-                    Log.e("RemoteMediator", "ResultOf.Error with message: ${response.error?.message}")
+                    Log.e(
+                        "RemoteMediator",
+                        "ResultOf.Error with message: ${response.error?.message}"
+                    )
                     if (response.error is java.nio.channels.UnresolvedAddressException) {
                         MediatorResult.Success(endOfPaginationReached = false)
                     } else {

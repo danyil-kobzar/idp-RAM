@@ -13,11 +13,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ua.polodarb.ram.presentation.core.mvi.reducer.Reducer
 import ua.polodarb.ram.presentation.core.mvi.UiEffect
 import ua.polodarb.ram.presentation.core.mvi.UiEvent
 import ua.polodarb.ram.presentation.core.mvi.UiIntent
 import ua.polodarb.ram.presentation.core.mvi.UiState
+import ua.polodarb.ram.presentation.core.mvi.reducer.Reducer
 import ua.polodarb.ram.presentation.core.platform.error.ApiExceptions
 import ua.polodarb.ram.presentation.core.platform.error.CustomUiError
 
@@ -85,7 +85,9 @@ abstract class BaseViewModel<S : UiState, E : UiEvent, EF : UiEffect, I : UiInte
             is ApiExceptions.UnauthorizedException -> CustomUiError.UnauthorizedError(cause)
             is ApiExceptions.ForbiddenException -> CustomUiError.ForbiddenError(cause)
             is ApiExceptions.NoNetworkException -> CustomUiError.NoNetworkError(cause)
-            else -> CustomUiError.UnknownError(cause.localizedMessage ?: "An unknown error occurred.", cause)
+            else -> CustomUiError.UnknownError(
+                cause.localizedMessage ?: "An unknown error occurred.", cause
+            )
         }
     }
 

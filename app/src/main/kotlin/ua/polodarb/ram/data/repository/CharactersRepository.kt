@@ -37,4 +37,8 @@ interface CharactersRepository {
         characterRemoteKeys: List<CharacterRemoteKey>
     )
 
+    suspend fun saveGridColumnCount(count: Int)
+
+    suspend fun loadGridColumnCount(): Int
+
 }

@@ -12,4 +12,5 @@ sealed class CharactersEvent : UiEvent {
     data class ShowGlobalLoading(val visibility: Boolean) : CharactersEvent()
     data class SearchCharacters(val query: String) : CharactersEvent()
     data class ShowError(val error: CustomUiError) : CharactersEvent()
+    data class UpdateGridColumnCount(val count: Int) : CharactersEvent()
 }

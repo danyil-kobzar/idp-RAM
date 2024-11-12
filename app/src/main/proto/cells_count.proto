@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+option java_package = "ua.polodarb.ram.data.preference.model";
+option java_multiple_files = true;
+
+message CellsCountProtoModel {
+    int32 cells_count = 2;
+}
