@@ -134,12 +134,7 @@ fun EpisodesScreen(
                                 episode?.let { episodeItem ->
                                     if (episodeItem.seasonId == it.seasonId) {
                                         EpisodeCard(
-                                            episode = episodeItem,
-                                            onEpisodeClick = { episodeId ->
-                                                onAction?.invoke(
-                                                    EpisodesAction.SelectEpisode(episodeId)
-                                                )
-                                            }
+                                            episode = episodeItem
                                         )
                                     }
                                 }

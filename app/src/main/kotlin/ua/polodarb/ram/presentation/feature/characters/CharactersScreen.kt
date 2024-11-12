@@ -154,12 +154,7 @@ fun CharactersScreen(
                                 val character = characters[index]
                                 character?.let { characterItem ->
                                     CharacterCard(
-                                        character = characterItem,
-                                        onCharacterClick = { characterId ->
-                                            onAction?.invoke(
-                                                CharactersAction.SelectCharacter(characterId)
-                                            )
-                                        }
+                                        character = characterItem
                                     )
                                 }
                             }
